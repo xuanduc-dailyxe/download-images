@@ -8,482 +8,10 @@
 
 
     <link rel="icon" href="https://cdn.dailyxe.com.vn/image/logo-download-308263j.png" type="image/gif" sizes="16x16">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js" type="text/javascript"> </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.js" type="text/javascript"> </script>
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,500;0,700;1,300;1,500;1,700&display=swap');
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            padding: 0px;
-            margin: 0px;
-            font-size: 15px;
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        img {
-            max-width: 100%;
-        }
-
-        .container {
-            max-width: 1100px;
-            width: 1100px;
-            margin: auto;
-            padding: 0px 10px;
-        }
-
-        .form-control {
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 100%;
-            height: 45px;
-            font-size: 100%;
-        }
-
-        .form-control.disable {
-            background-color: #eee;
-        }
-
-        textarea:focus-visible,
-        input:focus-visible {
-            outline: none;
-        }
-
-        textarea {
-            padding: 7px 12px;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 100%;
-            min-width: 100%;
-        }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        .btn {
-            padding: 10px 12px;
-            background-color: #ddd;
-            border-radius: 5px;
-            font-size: 100%;
-            border: none;
-            height: 45px;
-            color: #fff;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-secondary {
-            background-color: #444;
-        }
-
-        .btn-secondary:hover {
-            background-color: #555;
-        }
-
-        .btn-default {
-            background-color: #4CAF50;
-        }
-
-        .btn-default:hover {
-            background-color: #339736;
-        }
-
-        .btn-primary {
-            background-color: #008CBA;
-        }
-
-        .btn-primary:hover {
-            background-color: #076f92;
-        }
-
-        .disabled {
-            cursor: default;
-            pointer-events: none;
-            opacity: .6;
-        }
-
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0px -10px;
-        }
-
-        [class^="col-"] {
-            padding: 0px 10px;
-        }
-
-        .box-config {
-            background-color: #eee;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
-
-        .col-8 {
-            width: 66.66%;
-        }
-
-        .col-2 {
-            width: 16.66%;
-        }
-
-        .col-4 {
-            width: 33.33%;
-        }
-
-        .col-6 {
-            width: 50%;
-        }
-
-        .col-12 {
-            width: 100%;
-        }
-
-        textarea {
-            width: 100%;
-            border: 1px solid #ccc;
-            background-color: #f8f8f8;
-        }
-
-        textarea::-webkit-scrollbar-track {
-            background-color: #F5F5F5;
-        }
-
-        textarea::-webkit-scrollbar {
-            width: 5px;
-            background-color: transparent;
-        }
-
-        textarea::-webkit-scrollbar-thumb {
-            background-color: #ccc;
-        }
-
-
-        .tools {
-            padding: 100px;
-        }
-
-        .mr-1 {
-            margin-right: 5px;
-        }
-
-        .mb-1 {
-            margin-bottom: 10px;
-        }
-
-        .mb-4 {
-            margin-bottom: 20px;
-        }
-
-        .btn-group {
-            display: flex;
-            align-items: center;
-        }
-
-        #image-list {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        #image-list div {
-            width: 20%;
-            border: 1px solid #fff;
-            margin-bottom: 20px;
-        }
-
-        #image-list div span {
-            padding: 5px;
-            text-align: center;
-            display: block;
-            font-size: 12px;
-            color: #888;
-            line-break: anywhere;
-        }
-
-        #image-list-container {
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .header .title {
-            font-size: 200%;
-            font-weight: bold;
-            margin: 0px;
-            line-height: 1;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            margin: 0px;
-        }
-
-        .logo {
-            width: 60px;
-            margin-right: 10px;
-        }
-
-        .logo-fixed {
-            position: fixed;
-            top: 80vh;
-            left: -50px;
-            width: 300px;
-            height: 300px;
-            opacity: .05;
-            pointer-events: none;
-            cursor: default;
-        }
-
-        .spinner {
-            display: block;
-            position: fixed;
-            top: 0px;
-            left: 0px;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            background-color: rgba(0, 0, 0, .8);
-        }
-
-        .spinner .spinner-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            text-align: center;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px 50px;
-        }
-
-        .spinner .spinner-content span {
-            display: block;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: #4CAF50;
-            border-bottom-color: #4CAF50;
-            border-right-color: #efefef;
-            border-left-color: #efefef;
-            animation: spinner 1s infinite;
-            margin-bottom: 20px;
-        }
-
-        .spinner .spinner-content p {
-            margin-bottom: 0px;
-        }
-
-        .spinner .value {
-            margin: 0px;
-            display: block;
-            position: absolute;
-            top: 45px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
-        .none {
-            display: none;
-        }
-
-        .tab-content {
-            margin-bottom: 20px;
-        }
-
-        .nav-tabs {
-            list-style: none;
-            margin: 0px;
-            padding: 0px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            background-color: #fff;
-            border-top-right-radius: 10px;
-            border-top-left-radius: 10px;
-        }
-
-        .tab-pane {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            border-top-left-radius: 0px;
-        }
-
-        .nav-item {
-            margin-bottom: -1px;
-        }
-
-        .nav-item:not(:first-child) {
-            margin-left: -1px;
-        }
-
-        .nav-link {
-            width: 100%;
-            font-size: 100%;
-            background-color: #f8f8f8;
-            border: 1px solid #ccc;
-            padding: 10px 30px;
-            margin-right: 2px;
-            cursor: pointer;
-            color: #888;
-            display: flex;
-            align-items: center;
-        }
-
-        .material-symbols-rounded {
-            margin-right: 5px;
-        }
-
-        .nav-link.active {
-            display: flex;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
-
-        .nav-link.active {
-            color: #333;
-            background-color: #fff;
-            border-bottom-color: transparent;
-        }
-
-        .nav-item:first-child .nav-link {
-            border-top-left-radius: 5px;
-        }
-
-        .nav-item:last-child .nav-link {
-            border-top-right-radius: 5px;
-        }
-
-        .label {
-            display: inline-block;
-            padding: 2px 0px;
-            font-size: 14px;
-        }
-
-        .exp {
-            display: inline-block;
-            font-size: 12px;
-            color: #888;
-            padding: 2px 0px;
-        }
-
-        .img-item {
-            display: block;
-            position: relative;
-        }
-
-        #image-list .img-item img {
-            min-height: 137px;
-            object-fit: contain;
-        }
-
-        #image-list .img-item .btn-delete {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background-color: #88888896;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .textarea-html {
-            width: 100%;
-            min-height: 260px;
-        }
-
-        .input-regex {
-            position: relative;
-            overflow: hidden;
-            border-radius: 4px;
-            width: 100%;
-        }
-
-        .input-regex input {
-            width: 100%;
-            padding-left: 30px;
-        }
-
-        .input-regex::before {
-            position: absolute;
-            top: 0px;
-            height: 100%;
-            left: 0px;
-            content: "\/";
-            color: #333;
-            background-color: rgba(0, 0, 0, .05);
-            width: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 0;
-        }
-
-        .input-regex::after {
-            position: absolute;
-            top: 0px;
-            height: 100%;
-            right: 0px;
-            content: "\/g";
-            color: #333;
-            background-color: rgba(0, 0, 0, .05);
-            width: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 0;
-        }
-
-        @keyframes spinner {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            50% {
-                transform: rotate(180deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
-</head>
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" /> 
+    <link rel="stylesheet" href="css/style.css">
+ 
+</head> 
 <body>
     <img class="logo-fixed" src="https://cdn.dailyxe.com.vn/image/logo-download-308263j.png" alt="">
     <div class="tools">
@@ -493,10 +21,8 @@
                 <div class="">
                     <h1 class="title">Images Downloader</h1>
                     <p>Hỗ trợ tải hình ảnh số lượng lớn nhanh chóng.</p>
-                </div>
-
-            </div>
-
+                </div> 
+            </div> 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" data-toggle="tab" data-target="#tab-content-1" type="button" role="tab" aria-controls="tab1" aria-selected="true"><span class="material-symbols-rounded">link</span>Tải ảnh từ danh sách Url</button>
@@ -516,13 +42,13 @@
                     <div class="row">
                         <div class="col-8">
                             <span class="label">Mảng data URL:</span>
-                            <textarea class="form-control" style="height: 200px;" id="input-list-img" type="text" placeholder="Nhập đường dẫn hình (url-1.jpg,url-2.jpg,...)"></textarea>
+                            <textarea class="form-control" style="height: 200px;" id="input-list-img" data-field="input-list-img" type="text" placeholder="Nhập đường dẫn hình (url-1.jpg,url-2.jpg,...)"></textarea>
                             <span class="exp">VD: dataJson (đã stringify) hoặc url-1.jpg,url-2,...</span>
                         </div>
                         <div class="col-4">
                             <span class="label">Bạn muốn:</span>
                             <div class="btn-group">
-                                <button class="btn btn-secondary mr-1" onclick="checkImage()"><span class="material-symbols-rounded">sprint</span>Trích xuất hình</button>
+                                <button class="btn btn-secondary mr-1" onclick="checkImage('#tab-content-1')"><span class="material-symbols-rounded">sprint</span>Trích xuất hình</button>
                             </div>
                         </div>
                     </div>
@@ -530,7 +56,7 @@
                 <div class="tab-pane fade" id="tab-content-2" role="tabpanel" aria-labelledby="profile-tab">
                     <div class="row data-config">
                         <div class="col-8 mb-4">
-                            <span class="label">Đường dẫn thư mục:</span>
+                            <span class="label">Đường dẫn hình:</span>
                             <input class="form-control" id="url-folder" data-field="folder" type="text" placeholder="Nhập đường dẫn hình (url-1.jpg,url-2.jpg,...)" />
                             <span class="exp">VD: https://www.honda.com.vn/o-to/san-pham/honda-hrv/dist/assets/images/s-color/red/</span>
                         </div>
@@ -561,12 +87,12 @@
                     <div class="row">
                         <div class="col-4">
                             <span class="label">Url:</span>
-                            <input class="form-control" id="input-urlpage" type="text" placeholder="Nhập đường dẫn trang..." />
+                            <input class="form-control" id="input-urlpage" data-field="input-urlpage" type="text" placeholder="Nhập đường dẫn trang..." />
                             <span class="exp">VD: https://dailyxe.com.vn/, https://zingnews.vn/,...</span>
                         </div>
                         <div class="col-4">
                             <span class="label">Giới hạn trong:</span>
-                            <input class="form-control" id="input-class-parent" type="text" placeholder="Nhập .class hoặc #id chứa hình..." />
+                            <input class="form-control" id="input-class-parent" data-field="input-class-parent" type="text" placeholder="Nhập .class hoặc #id chứa hình..." />
                             <span class="exp">VD: Lấy hình trong .class hoặc #id của thẻ nào đó.</span>
                         </div>
                         <div class="col-4">
@@ -581,22 +107,28 @@
                     <div class="row">
                         <div class="col-8">
                             <span class="label">Html:</span>
-                            <textarea class="form-control textarea-html" id="input-html" rows="5" type="text" placeholder="Nhập nội dung html..."></textarea>
+                            <textarea class="form-control textarea-html" id="input-html" data-field="input-html" rows="10" type="text" placeholder="Nhập nội dung html..."></textarea>
                             <span class="exp">VD: Nhập nội dung html chứa hình,...</span>
                         </div>
                         <div class="col-4">
                             <div class="row">
                                 <div class="col-12 mb-4">
                                     <span class="label">Domain (nếu có):</span>
-                                    <input class="form-control" id="input-domain" type="text" placeholder="Nhập domain chứa hình..." />
+                                    <input class="form-control" id="input-domain" data-field="input-domain" type="text" placeholder="Nhập domain chứa hình..." />
                                     <span class="exp">VD: Nhập domain nếu có đường dẫn thiếu domain.</span>
                                 </div>
                                 <div class="col-12 mb-4">
                                     <span class="label">Regex lấy tên để sort (nếu thứ tự không đúng):</span>
                                     <div class="input-regex">
-                                        <input class="form-control" id="input-regex" type="text" placeholder="Nhập regex chứa hình..."/>
+                                        <input class="form-control" id="input-regex" data-field="input-regex" type="text" placeholder="Nhập regex chứa hình..."/>
                                     </div>
                                     <span class="exp">VD: Số: (\d+)\.(jpg|png) - Chữ: (\w)\.(jpg|png)</span>
+                                </div>
+                                <div class="col-12 mb-4">
+                                    <div class="btn-group">
+                                        <input class="form-control mr-1" id="check-find-picture" data-field="check-find-picture" type="checkbox" />
+                                        <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Tìm thẻ picture thay cho img</span>
+                                    </div>
                                 </div>
                                 <div class="col-12 mb-4" style="width: 100%;">
                                     <span class="label">Bạn muốn:</span>
@@ -613,37 +145,47 @@
             <div id="image-list-container">
                 <div class="box-config">
                     <div class="row">
-                        <div class="col-6 mb-4">
-                            <div class="btn-group" style="justify-content: flex-start;">
-                                <span class="label" style="width: 100px;flex-shrink: 0; text-align: left; margin-right: 10px;">Tên file hình</span>
-                                <input class="form-control mr-1" style="text-align: right;" id="input-filename" type="text" value="" placeholder="Nhập tên file (name-{index}.jpg)..." />
-                                <span style="width: 174px;flex-shrink: 0;">-{index}.<span id="label-extention">jpg</span></span>
+                        <div class="col-4 mb-4"> 
+                            <span class="label" style="width: 100px;flex-shrink: 0; text-align: left; margin-right: 10px;">Tên file hình</span>
+                                <div class="btn-group">
+                                <input class="form-control mr-1" style="text-align: right;" id="input-filename" data-field="input-filename" type="text" value="" placeholder="Nhập tên file (name-{index}.jpg)..." />
+                                <span style="width: 90px;flex-shrink: 0;">-{index}.<span id="label-extention">jpg</span></span>
                             </div>
                         </div>
-                        <div class="col-6 mb-4">
+                        <div class="col-4 mb-4"> 
+                            <span class="label" style=" flex-shrink: 0; text-align: right; margin-right: 10px;">Tên file nén</span>
                             <div class="btn-group">
-                                <span class="label" style=" flex-shrink: 0; text-align: right; margin-right: 10px;">Tên file nén</span>
-                                <input class="form-control mr-1" id="input-filename-zip" type="text" value="img_zip" placeholder="Nhập tên file (name.zip)..." />
-                                <span style="width: 80px;flex-shrink: 0;">.zip</span>
-                            </div>
+                                <input class="form-control mr-1" style="text-align: right;" id="input-filename-zip" data-field="input-filename-zip" type="text" value="img_zip" placeholder="Nhập tên file (name.zip)..." />
+                                <span style="width: 80px;flex-shrink: 0;">.zip</span> 
+                            </div> 
                         </div>
+                        <div class="col-4"> 
+                            <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Extention</span>
+                            <input class="form-control mr-1" style="text-align: right;" id="input-extention"  data-field="input-extention" type="text" value="" placeholder="Nhập jpg,jpeg,png..." /> 
+                        </div> 
+                        <div class="col-2" > 
+                            <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Width (px)</span> 
+                            <input class="form-control mr-1" style="text-align: right;" id="input-width" data-field="input-width" type="number" value="" placeholder="Nhập width..." />   
+                        </div> 
+                        <div class="col-2" > 
+                            <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Height (px)</span> 
+                            <input class="form-control mr-1" style="text-align: right;" id="input-height" data-field="input-height" type="number" value="" placeholder="Nhập height..." />   
+                        </div> 
                         <div class="col-4">
-                            <div class="btn-group" style="justify-content: flex-start;">
-                                <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Extention</span>
-                                <input class="form-control mr-1" id="input-extention" type="text" value="" placeholder="Nhập jpg,jpeg,png..." />
-                            </div>
-                        </div>
-                        <div class="col-4" style="display: flex; align-items: center;">
-                            <div class="btn-group">
-                                <input class="form-control mr-1" id="check-remove-params" type="checkbox" />
-                                <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Loại bỏ params hình</span>
-                            </div>
-                            <div class="btn-group">
-                                <input class="form-control mr-1" id="check-reverse" type="checkbox" />
-                                <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Reverse</span>
-                            </div>
-                        </div>
+                            <span class="label">Tùy chọn</span> 
+                            <div style="display: flex; align-items: center; height: 50px;">
+                                <div class="btn-group">
+                                    <input class="form-control mr-1" id="check-remove-params" data-field="check-remove-params" type="checkbox" />
+                                    <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Loại bỏ params hình</span>
+                                </div>
+                                <div class="btn-group">
+                                    <input class="form-control mr-1" id="check-reverse" data-field="check-reverse" type="checkbox" />
+                                    <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Reverse</span>
+                                </div>
+                            </div> 
+                        </div> 
                         <div class="col-4">
+                            <span class="label">Tải xuống</span> 
                             <div class="btn-group">
                                 <button class="btn btn-primary btn-download mr-1 disabled" onclick="downloadAll()"><span class="material-symbols-rounded">download</span>Tải từng hình</button>
                                 <button class="btn btn-default btn-download disabled" onclick="downloadZip()"><span class="material-symbols-rounded">folder_zip</span>Tải file nén</button>
@@ -655,8 +197,7 @@
                 <textarea class="mb-4" id="url-list" rows="10"></textarea>
                 <div class="mb-1">Danh sách theo cấu hình:</div>
                 <div class="mb-4" id="image-list"></div>
-            </div>
-
+            </div> 
         </div>
         <div class="spinner none" id="spinner">
             <div class="spinner-content">
@@ -667,529 +208,11 @@
         </div>
     </div>
 
-    <script>
-        var dataConfig = {
-            tabActiveDefault: "#tab-content-1",
-            urlPage: "",
-            html: "",
-            regex: "",
-            domain: "",
-            filename: "",
-            filenameZip: "",
-            extention: "",
-            folder: "",
-            name: "",
-            start: 1,
-            count: 70,
-        };
-        var arrImages = [];
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.js" type="text/javascript"></script> 
 
-        function checkImageHTML() {
-            var urlHtml = $("#input-html").val();
-            var inputRegex = $("#input-regex").val();
-            var removeParams = $("#check-remove-params");
-            var urlPage = $("#input-domain").val();
-            var imgTags = $(urlHtml).find("img");
-            var imgTagsTemp = [];
-            var imgArr = [];
-            var datasrc, src, url, filename;
-            var arrayFlash;
-            var regex = inputRegex && inputRegex .length > 0 ? new RegExp(inputRegex, 'g') : null;
-            var id;
-            imgTags.each(function (index, item) {
-                datasrc = $(this).attr("data-src");
-                src = $(this).attr("src");
-                if (datasrc != undefined || src != undefined) {
-                    if (removeParams.is(":checked")) {
-                        url = datasrc ? datasrc.split('?')[0] : src.split('?')[0];
-                    } else {
-                        url = datasrc ? datasrc : src;
-                    }
-                    arrayFlash = url.split('/');
-                    filename = arrayFlash[arrayFlash.length - 1];
-
-                    if (url && isValidUrl(url)) {
-                        if (regex !== null) {
-                            while ((m = regex.exec(filename)) !== null) {
-                                try {
-                                    imgTagsTemp.push({ "id": parseInt(m[1]) < 10 ? '0' + m[1] : m[1], "url": url })
-                                } catch (error) {
-                                    imgTagsTemp.push({ "id": m[1], "url": url })
-                                }
-                            }
-                        } else {
-                            imgTagsTemp.push({ "id": index, "url": url })
-                        }
-
-                    } else {
-                        if (urlPage && urlPage.length > 0) {
-                            let domain = (new URL(urlPage));
-                            const protocol = domain.protocol;
-                            domain = protocol + "//" + domain.hostname;
-                            url = domain + url;
-                            if (regex !== null) {
-                                while ((m = regex.exec(filename)) !== null) {
-                                    try {
-                                        imgTagsTemp.push({ "id": parseInt(m[1]) < 10 ? '0' + m[1] : m[1], "url": url })
-                                    } catch (error) {
-                                        imgTagsTemp.push({ "id": m[1], "url": url })
-                                    }
-                                }
-                            } else {
-                                imgTagsTemp.push({ "id": index, "url": url })
-                            }
-                        }
-                    }
-                }
-            });
-            if(imgTagsTemp){
-                imgTagsTemp.sort((a, b) => (a.id > b.id) ? 1 : -1);
-            } 
-            $.each(imgTagsTemp, function (index, item) {
-                imgArr.push(item.url);
-            })
-            if (imgArr && imgArr.length > 0) {
-                buildHtmlImages(imgArr);
-            } else {
-                alert("Không tìm thấy hình ảnh!");
-                $(".btn-download").addClass("disabled");
-            }
-        }
-
-
-        function checkImageOption() {
-            $("#input-list-img,#url-list,#image-list").html("");
-            var urlFolder = $("#url-folder").val();
-            var urlCount = parseInt($("#url-count").val());
-            var urlName = $("#url-name").val();
-            var urlStart = parseInt($("#url-start").val());
-            var imgArr = [];
-            var fileName;
-            if (urlFolder && urlCount > 0 && urlName) {
-                for (var i = urlStart; i < urlCount + urlStart; i++) {
-                    fileName = urlName.replaceAll("{index}", i);
-                    imgArr.push(urlFolder + fileName);
-                }
-            }
-            if (imgArr) {
-                buildHtmlImages(imgArr);
-            } else {
-                $(".btn-download").addClass("disabled");
-            }
-        }
-
-        function checkImage() {
-            $("#input-list-img,#url-list,#image-list").html("");
-
-            var str = $("#input-list-img").val();
-           
-            if (str.trim().length == 0) {
-                alert("Bạn chưa nhập dữ liệu!.")
-                return;
-            }
-            var imgArr = [];
-            if(!str.includes(",") && str.includes("\n")){
-                str = str.replaceAll("\n", ",");
-            } 
-            str = str.replaceAll("\&quot;", "\"");
-            try {
-                imgArr = JSON.parse(str);
-            }
-            catch {
-                str = str.replaceAll("\"", "");
-                str = str.replaceAll("\"|[|]", "");
-                imgArr = str.split(",");
-            } 
-            if (imgArr) {
-                buildHtmlImages(imgArr);
-            } else {
-                $(".btn-download").addClass("disabled");
-            }
-        }
-
-        function checkImagePage() {
-            var urlPage = $("#input-urlpage").val();
-            var tagParent = $("#input-class-parent").val();
-            var removeParams = $("#check-remove-params");
-            $.ajax({
-                url: urlPage, success: function (data) {
-                    var wrapper = document.createElement('div');
-                    wrapper.innerHTML = data;
-                    var imgTags;
-                    if (tagParent && tagParent.length > 0) {
-                        imgTags = $(wrapper).find(tagParent).find("img");
-                    } else {
-                        imgTags = $(wrapper).find("img");
-                    }
-                    var imgArr = [];
-                    var datasrc, src, url;
-                    imgTags.each(function () {
-                        datasrc = $(this).attr("data-src");
-                        src = $(this).attr("src");
-                        if (datasrc != undefined || src != undefined) {
-                            if (removeParams.is(":checked")) {
-                                url = datasrc ? datasrc.split('?')[0] : src.split('?')[0];
-                            } else {
-                                url = datasrc ? datasrc : src;
-                            }
-                            if (url && isValidUrl(url)) {
-                                imgArr.push(url);
-                            } else {
-                                let domain = (new URL(urlPage));
-                                const protocol = domain.protocol;
-                                domain = protocol + "//" + domain.hostname;
-                                url = domain + url;
-                                console.log("url", url);
-                                if (url && isValidUrl(url)) {
-                                    imgArr.push(url);
-                                }
-                            }
-                        }
-                    });
-                    if (imgArr && imgArr.length > 0) {
-                        buildHtmlImages(imgArr);
-                    } else {
-                        alert("Không tìm thấy hình ảnh!");
-                        $(".btn-download").addClass("disabled");
-                    }
-                }
-            });
-        }
-
-        function formatNumberToString(number) {
-            if (+number < 10) {
-                return "0" + number;
-            }
-            return number;
-        }
-
-        function buildHtmlImages(imgArr) {
-            if (imgArr && imgArr.length > 0) {
-                $("#input-list-img,#url-list,#image-list").html("");
-                if (!isValidUrl(imgArr[0])) {
-                    alert("Có lỗi ở dữ liệu đầu vào. Vui lòng kiểm tra lại!");
-                    $(".btn-download").addClass("disabled");
-                    return;
-                }
-                var fileNameImage = $("#input-filename").val();
-                var fileExtention = $('#input-extention').val();
-                var checkReverse = $('#check-reverse');
-                var fileName = extent = strExtent = "";
-                var arrStr = [];
-                if (checkReverse.is(":checked")) {
-                    arrImages = imgArr.reverse();
-                } else {
-                    arrImages = imgArr;
-                }
-
-                for (let i = 0; i < arrImages.length; i++) {
-                    fileName = "";
-                    arrStr = arrImages[i].trim().split("/");
-                    fileName = arrStr[arrStr.length - 1];
-                    fileName = fileName.split('?')[0];
-                    if (fileNameImage && fileNameImage.length > 0) {
-
-                        if (fileExtention && fileExtention.length > 0) {
-                            $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" onClick="deleteArrImg(${i})" data-id="${i}">X</span><img src="${arrImages[i].trim()}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
-                        } else {
-                            extent = fileName.split(".");
-                            strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-                            strExtent = strExtent.split('?')[0];
-                            $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" onClick="deleteArrImg(${i})" data-id="${i}">X</span><img src="${arrImages[i].trim()}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
-                            $("#label-extention").text(strExtent);
-                        }
-                    } else {
-                        $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" onClick="deleteArrImg(${i})" data-id="${i}">X</span><img src="${arrImages[i].trim()}" /><span>${fileName}</span></div>`);
-                    }
-                }
-
-
-
-                $("#number-img").html("(" + arrImages.length + " hình)");
-                $("#url-list").html(arrImages.toString().replaceAll(",", ",&#13;&#10;"));
-                $("#image-list-container").css("opacity", "1");
-                $(".btn-download").removeClass("disabled");
-            }
-        }
-
-        function deleteArrImg(index) {
-            arrImages.splice(index, 1);
-            $(".img-item").eq(index).remove();
-            console.log("arrImages", arrImages);
-        }
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (err) {
-                return false;
-            }
-        }
-
-        function saveLocal() {
-            var urls = $("#input-list-img").val();
-            localStorage.setItem("urllist", urls);
-        }
-
-        function getLocal() {
-            var urls = localStorage.getItem("urllist");
-            return urls ? urls : "";
-        }
-
-        function saveLocalConfig() {
-            var dataStr = JSON.stringify(dataConfig);
-            localStorage.setItem("data-config", dataStr);
-        }
-
-        function getLocalConfig() {
-            var dataConfigRaw = localStorage.getItem("data-config");
-
-            if (dataConfigRaw) {
-                return JSON.parse(dataConfigRaw);
-            }
-        }
-
-        $("#input-list-img").on("change", function () {
-            saveLocal();
-        });
-
-        $("#input-html").on("change", function () {
-            dataConfig.html = $(this).val();
-            saveLocalConfig();
-        });
-
-        $("#input-regex").on("change", function () {
-            dataConfig.regex = $(this).val();
-            saveLocalConfig();
-        });
-
-        $("#input-domain").on("change", function () {
-            dataConfig.domain = $(this).val();
-            saveLocalConfig();
-        });
-
-        $("#input-filename").on("change", function () {
-            dataConfig.filename = $(this).val();
-            saveLocalConfig();
-            buildHtmlImages(arrImages);
-        });
-
-        $("#input-filename-zip").on("change", function () {
-            dataConfig.filenameZip = $(this).val();
-            saveLocalConfig();
-        });
-
-        $("#input-urlpage").on("change", function () {
-            dataConfig.urlPage = $(this).val();
-            saveLocalConfig();
-        });
-
-        $("#input-extention").on("change", function () {
-            dataConfig.extention = $(this).val();
-            saveLocalConfig();
-        });
-
-        $("#check-reverse").on("change", function () {
-            checkImage();
-        });
-
-        const timer = ms => new Promise(res => setTimeout(res, ms))
-
-        const downloadAll = async () => {
-            let link = document.createElement("a");
-            document.documentElement.append(link);
-            var fileNameImage = $("#input-filename").val();
-            var fileExtention = $('#input-extention').val();
-            fileNameImage = fileNameImage && fileNameImage.length > 0 ? fileNameImage : "image_";
-            var imgArr = arrImages;
-            var extent = strExtent = "";
-
-            if (imgArr) {
-                for (let i = 0; i < imgArr.length; i++) {
-                    await fetch(imgArr[i])
-                        .then(res => res.blob())
-                        .then(blob => {
-                            let objectURL = URL.createObjectURL(blob);
-                            extent = imgArr[i].split(".");
-                            strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-                            strExtent = strExtent.split('?')[0];
-                            link.setAttribute("download", `${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention ? fileExtention : strExtent}`)
-                            link.href = objectURL;
-                            link.click()
-                        });
-                    await timer(500);
-                }
-            } else {
-                alert("Không có dữ liệu");
-                $("#input-list-img").focus();
-            }
-        };
-
-        const downloadZip = function () {
-            $("#spinner").removeClass("none");
-            var zip = new JSZip();
-            var count = 0;
-            var str = $("#input-list-img").val();
-            var imgArr = arrImages;
-            var filename = $("#input-filename-zip").val();
-            var nombre = filename ? filename.trim() : "img_zip";
-            var name = nombre + ".zip";
-            saveZip(name, imgArr);
-        }
-
-        const saveZip = (filename, urls) => {
-            if (!urls) return;
-            var filename = $("#input-filename-zip").val();
-            var nombre = filename ? filename.trim() : "img_zip";
-            const zip = new JSZip();
-            const folder = zip.folder(nombre);
-            var fileNameImage = $("#input-filename").val();
-            var fileExtention = $('#input-extention').val();
-            var extent = strExtent = "";
-            urls.forEach((url, index) => {
-                const blobPromise = fetch(url).then((r) => {
-                    if (r.status === 200) return r.blob();
-                    return Promise.reject(new Error(r.statusText));
-                });
-                const name = url.substring(url.lastIndexOf("/") + 1);
-                if (fileNameImage && fileNameImage.length > 0) {
-                    extent = name.split(".");
-                    strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-                    strExtent = strExtent.split('?')[0];
-                    folder.file(`${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`, blobPromise);
-                } else {
-                    folder.file(`${name}`, blobPromise);
-                }
-            });
-
-            zip.generateAsync({ type: "blob" }, function updateCallback(metadata) {
-                $(".spinner .value").text(Math.round(metadata.percent, 0) + "%");
-            }).then((blob) => {
-                saveAs(blob, filename);
-                $(".spinner-text").text("Đang chuẩn bị dữ liệu...");
-                $("#spinner").addClass("none");
-            });
-        };
-
-        WebPDecodeAndDraw = function (data) {
-            var decoder = new WebPDecoder();
-            var bitmap = decoder.WebPDecode(data, data.length);
-            var dataURL;
-            if (bitmap) {
-                //Draw Image
-                var output = ctx.createImageData(canvas.width, canvas.height);
-                var biWidth = canvas.width;
-                var outputData = output.data;
-                for (var h = 0; h < canvas.height; h++) {
-                    for (var w = 0; w < canvas.width; w++) {
-                        outputData[0 + w * 4 + (biWidth * 4) * h] = bitmap[0 + w * 4 + (biWidth * 4) * h];
-                        outputData[1 + w * 4 + (biWidth * 4) * h] = bitmap[1 + w * 4 + (biWidth * 4) * h];
-                        outputData[2 + w * 4 + (biWidth * 4) * h] = bitmap[2 + w * 4 + (biWidth * 4) * h];
-                        outputData[3 + w * 4 + (biWidth * 4) * h] = bitmap[3 + w * 4 + (biWidth * 4) * h];
-                    };
-                }
-                ctx.putImageData(output, 0, 0);
-                dataURL = canvas.toDataURL("image/png");
-                return dataURL;
-            }
-            return dataURL;
-        };
-
-
-        function getImage(img) {
-            // Create an empty canvas element
-            canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            // Copy the image contents to the canvas
-            ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
-            return WebPDecodeAndDraw(ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)['data']);
-        }
-
-
-        function toogleClassActive(e) {
-            if (e.target.classList.contains('active')) {
-                e.target.classList.remove("active")
-            } else {
-                e.target.classList.add("active")
-            }
-            console.log("toogleClassActive")
-        }
-
-
-
-        $(".nav-link").on("click", function () {
-            $(".nav-link").removeClass("active");
-            $(this).addClass("active");
-            var target = $(this).attr("data-target");
-            $(".tab-pane").removeClass("active");
-            $(target).addClass("active");
-
-            dataConfig["tabActiveDefault"] = target;
-            saveLocalConfig();
-        })
-
-        $(document).ready(function () {
-            var urls = getLocal();
-            var dataConfigRaw = getLocalConfig();
-            if (urls) {
-                $("#input-list-img").val(urls);
-            }
-            if (dataConfigRaw) {
-                dataConfig = dataConfigRaw;
-                if (dataConfig.tabActiveDefault) {
-                    $('.nav-link[data-target="' + dataConfig.tabActiveDefault + '"]').click();
-                }
-                if (dataConfig.folder) {
-                    $('#url-folder').val(dataConfig.folder);
-                }
-                if (dataConfig.count) {
-                    $('#url-count').val(dataConfig.count);
-                }
-                if (dataConfig.name) {
-                    $('#url-name').val(dataConfig.name);
-                }
-                if (dataConfig.start) {
-                    $('#url-start').val(dataConfig.start);
-                }
-                if (dataConfig.filename) {
-                    $('#input-filename').val(dataConfig.filename);
-                }
-                if (dataConfig.filenameZip) {
-                    $('#input-filename-zip').val(dataConfig.filenameZip);
-                }
-                if (dataConfig.urlPage) {
-                    $('#input-urlpage').val(dataConfig.urlPage);
-                }
-                if (dataConfig.extention) {
-                    $('#input-extention').val(dataConfig.extention);
-                }
-                if (dataConfig.domain) {
-                    $('#input-domain').val(dataConfig.domain);
-                }
-
-                if (dataConfig.html) {
-                    $('#input-html').val(dataConfig.html);
-                }
-                if (dataConfig.regex) {
-                    $('#input-regex').val(dataConfig.regex);
-                }
-            }
-
-            $(".data-config [data-field]").each(function () {
-                var instand = this;
-                $(instand).on("change", function () {
-                    var field = $(this).attr("data-field");
-                    dataConfig[field] = $(this).val();
-                    saveLocalConfig();
-                });
-            })
-        })
-
-    </script>
-</body>
-
+    <script src="js/main.js" type="text/javascript"></script> 
+</body> 
 </html>
