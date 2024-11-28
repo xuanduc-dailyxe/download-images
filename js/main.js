@@ -647,6 +647,9 @@ $(document).ready(function () {
                     break;
                 case "input-file-watermark": 
                     break; 
+                case "input-html":
+                    dataConfig[field] = $(this).getValue(); 
+                    break;
                 default:
                     dataConfig[field] = $(this).val();
                     break;
