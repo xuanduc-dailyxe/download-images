@@ -277,13 +277,13 @@ async function buildHtmlImages(imgArr) {
                 $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileName}</span></div>`);
             }
         }
-        $(".btn-delete").on("click", function () {
+        $("#image-list .img-item .btn-delete").on("click", function () {
             var index = $(this).closest(".img-item").index();
             arrImages.splice(index, 1);
             $(".img-item").eq(index).remove();
         })
 
-        $(".btn-download").on("click", function () {
+        $("#image-list .img-item .btn-download").on("click", function () {
             $("#spinner").removeClass("none");
             var index = $(this).closest(".img-item").index();
             var fileNameImage = $("#input-filename").val();
