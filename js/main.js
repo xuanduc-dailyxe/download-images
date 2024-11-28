@@ -244,7 +244,9 @@ async function buildHtmlImages(imgArr) {
             if (fileNameImage && fileNameImage.length > 0) {
 
                 response = await fetch(proxyUrl + arrImages[i].trim());
-                if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+                if (!response.ok){
+                    continue;
+                }
                 blob = await response.blob();
 
                 if (sizeConfig) {
@@ -410,7 +412,9 @@ async function downloadImageViaProxy(url, fileName) {
     try {
         // Tải ảnh qua proxy
         const response = await fetch(proxyUrl + url);
-        if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+        if (!response.ok){
+            return;
+        }
         const blob = await response.blob();
         var w = parseInt($("#input-width").val());
         var h = parseInt($("#input-height").val());
