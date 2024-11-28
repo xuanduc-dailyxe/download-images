@@ -86,8 +86,9 @@ function checkImageHTML() {
     $.each(imgTagsTemp, function (index, item) {
         imgArr.push(item.url);
     })
-    if (imgArr && imgArr.length > 0) {
-        buildHtmlImages(imgArr);
+    var uniqueImgArr = [...new Set(imgArr)];
+    if (uniqueImgArr && uniqueImgArr.length > 0) {
+        buildHtmlImages(uniqueImgArr);
     } else {
         alert("Không tìm thấy hình ảnh!");
         $(".btn-download").addClass("disabled");
@@ -139,8 +140,9 @@ function checkImage(id) {
     arrImages = $.grep(imgArr, function (value) {
         return value.trim().length > 0;
     });
-    if (arrImages) {
-        buildHtmlImages(arrImages);
+    var uniqueImgArr = [...new Set(arrImages)];
+    if (uniqueImgArr) {
+        buildHtmlImages(uniqueImgArr);
     } else {
         $(".btn-download").addClass("disabled");
     }
@@ -186,8 +188,9 @@ function checkImagePage() {
                     }
                 }
             });
-            if (imgArr && imgArr.length > 0) {
-                buildHtmlImages(imgArr);
+            var uniqueImgArr = [...new Set(imgArr)];
+            if (uniqueImgArr && uniqueImgArr.length > 0) {
+                buildHtmlImages(uniqueImgArr);
             } else {
                 alert("Không tìm thấy hình ảnh!");
                 $(".btn-download").addClass("disabled");
