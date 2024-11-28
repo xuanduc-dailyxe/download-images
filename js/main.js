@@ -1,5 +1,6 @@
 //const proxyUrl = 'https://api.allorigins.win/raw?url='; 
-const proxyUrl = ''; 
+const proxyUrl = '';
+
 var dataConfig = {
     tabActiveDefault: "#tab-content-1",
     urlPage: "",
@@ -10,10 +11,11 @@ var dataConfig = {
     filenameZip: "",
     extention: "",
     folder: "",
-    name: "", 
+    name: "",
     start: 1,
     count: 70,
 };
+
 var arrImages = [];
 
 function checkImageHTML() {
@@ -24,13 +26,13 @@ function checkImageHTML() {
     var checkFindPicture = $("#check-find-picture");
     var tag = checkFindPicture.is(":checked") ? "source" : "img"
 
-    var imgTags = $(urlHtml).find(tag); 
+    var imgTags = $(urlHtml).find(tag);
     var imgTagsTemp = [];
     var imgArr = [];
-    var datasrc, src,srcset, url, filename;
+    var datasrc, src, srcset, url, filename;
     var arrayFlash;
-    var regex = inputRegex && inputRegex .length > 0 ? new RegExp(inputRegex, 'g') : null;
- 
+    var regex = inputRegex && inputRegex.length > 0 ? new RegExp(inputRegex, 'g') : null;
+
     imgTags.each(function (index, item) {
         datasrc = $(this).attr("data-src");
         src = $(this).attr("src");
@@ -78,9 +80,9 @@ function checkImageHTML() {
             }
         }
     });
-    if(imgTagsTemp){
+    if (imgTagsTemp) {
         imgTagsTemp.sort((a, b) => (a.id > b.id) ? 1 : -1);
-    } 
+    }
     $.each(imgTagsTemp, function (index, item) {
         imgArr.push(item.url);
     })
@@ -116,15 +118,15 @@ function checkImageOption() {
 function checkImage(id) {
     $(id).find("#url-list,#image-list").html("");
 
-    var str = $(id).find("#input-list-img").val(); 
+    var str = $(id).find("#input-list-img").val();
     if (!str || str.trim().length == 0) {
         alert("Bạn chưa nhập dữ liệu!.")
         return;
     }
     var imgArr = [];
-    if(!str.includes(",") && str.includes("\n")){
+    if (!str.includes(",") && str.includes("\n")) {
         str = str.replaceAll("\n", ",");
-    } 
+    }
     str = str.replaceAll("\&quot;", "\"");
     try {
         imgArr = JSON.parse(str);
@@ -133,10 +135,10 @@ function checkImage(id) {
         str = str.replaceAll("\"", "");
         str = str.replaceAll("\"|[|]", "");
         imgArr = str.split(",");
-    }  
-    arrImages = $.grep(imgArr, function(value) {
+    }
+    arrImages = $.grep(imgArr, function (value) {
         return value.trim().length > 0;
-    }); 
+    });
     if (arrImages) {
         buildHtmlImages(arrImages);
     } else {
@@ -147,9 +149,9 @@ function checkImage(id) {
 function checkImagePage() {
     var urlPage = $("#input-urlpage").val();
     var tagParent = $("#input-class-parent").val();
-    var removeParams = $("#check-remove-params"); 
+    var removeParams = $("#check-remove-params");
     $.ajax({
-        url: proxyUrl+urlPage, success: function (data) {
+        url: proxyUrl + urlPage, success: function (data) {
             var wrapper = document.createElement('div');
             wrapper.innerHTML = data;
             var imgTags;
@@ -158,7 +160,7 @@ function checkImagePage() {
             } else {
                 imgTags = $(wrapper).find("img");
             }
-            
+
             var imgArr = [];
             var datasrc, src, url;
             imgTags.each(function () {
@@ -177,7 +179,7 @@ function checkImagePage() {
                         let domain = (new URL(urlPage));
                         const protocol = domain.protocol;
                         domain = protocol + "//" + domain.hostname;
-                        url = domain + url;  
+                        url = domain + url;
                         if (url && isValidUrl(url)) {
                             imgArr.push(url);
                         }
@@ -201,7 +203,7 @@ function formatNumberToString(number) {
     return number;
 }
 
-function buildHtmlImages(imgArr) {
+async function buildHtmlImages(imgArr) {
     if (imgArr && imgArr.length > 0) {
         $("#input-list-img,#url-list,#image-list").html("");
         if (!isValidUrl(imgArr[0])) {
@@ -214,12 +216,23 @@ function buildHtmlImages(imgArr) {
         var checkReverse = $('#check-reverse');
         var fileName = extent = strExtent = "";
         var arrStr = [];
+        var w = parseInt($("#input-width").val());
+        var h = parseInt($("#input-height").val());
+        var sizeConfig = undefined;
+
+        if (w > 0 && h > 0) {
+            sizeConfig = {
+                width: w,
+                height: h
+            };
+        }
+
         if (checkReverse.is(":checked")) {
             arrImages = imgArr.reverse();
         } else {
             arrImages = imgArr;
         }
-
+        var sizeInfo, response,blob,finalBlob, image, width, height, imageUrl, sizeInKB;
         for (let i = 0; i < arrImages.length; i++) {
             fileName = "";
             arrStr = arrImages[i].trim().split("/");
@@ -227,42 +240,63 @@ function buildHtmlImages(imgArr) {
             fileName = fileName.split('?')[0];
             if (fileNameImage && fileNameImage.length > 0) {
 
+                response = await fetch(proxyUrl + arrImages[i].trim());
+                if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+                blob = await response.blob();
+
+                if (sizeConfig) {
+                    finalBlob = await resizeByBlob(blob, sizeConfig);
+                } else {
+                    finalBlob = await fetch(arrImages[i].trim()).then((r) => {
+                        if (r.status === 200) return r.blob();
+                        return Promise.reject(new Error(r.statusText));
+                    });
+                }
+                console.log("finalBlob", finalBlob);
+                imageUrl = URL.createObjectURL(finalBlob);
+                image = await createImageBitmap(finalBlob);
+                width = image.width;
+                height = image.height;
+                sizeInKB = finalBlob.size / 1024;
+                sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
+                
+
                 if (fileExtention && fileExtention.length > 0) {
-                    $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${arrImages[i].trim()}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
+                    $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
                 } else {
                     extent = fileName.split(".");
                     strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
                     strExtent = strExtent.split('?')[0];
-                    $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${arrImages[i].trim()}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
+                    $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
                     $("#label-extention").text(strExtent);
                 }
             } else {
-                $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${arrImages[i].trim()}" /><span>${fileName}</span></div>`);
+                $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileName}</span></div>`);
             }
         }
-        $(".btn-delete").on("click", function(){
+        $(".btn-delete").on("click", function () {
             var index = $(this).closest(".img-item").index();
             arrImages.splice(index, 1);
-            $(".img-item").eq(index).remove(); 
-        }) 
+            $(".img-item").eq(index).remove();
+        })
 
-        $(".btn-download").on("click", function(){
-            $("#spinner").removeClass("none"); 
+        $(".btn-download").on("click", function () {
+            $("#spinner").removeClass("none");
             var index = $(this).closest(".img-item").index();
             var fileNameImage = $("#input-filename").val();
             var extent = arrImages[index].split(".");
             var strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
             strExtent = strExtent.split('?')[0];
-            downloadImageViaProxy(arrImages[index], `${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`); 
+            downloadImageViaProxy(arrImages[index], `${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`);
             $("#spinner").addClass("none");
-        }) 
+        })
 
         $("#number-img").html("(" + arrImages.length + " hình)");
         $("#url-list").html(arrImages.toString().replaceAll(",", ",&#13;&#10;"));
         $("#image-list-container").css("opacity", "1");
         $(".btn-download").removeClass("disabled");
     }
-} 
+}
 
 function isValidUrl(string) {
     try {
@@ -272,7 +306,7 @@ function isValidUrl(string) {
         return false;
     }
 }
-  
+
 function saveLocalConfig() {
     var dataStr = JSON.stringify(dataConfig);
     localStorage.setItem("data-config", dataStr);
@@ -291,88 +325,109 @@ $("#input-filename").on("change", function () {
     saveLocalConfig();
     buildHtmlImages(arrImages);
 });
- 
-$("#check-reverse").on("change", function () { 
+
+$("#check-reverse").on("change", function () {
     buildHtmlImages(arrImages);
 });
 
 const timer = ms => new Promise(res => setTimeout(res, ms))
-   
-async function downloadImageViaProxy(url, fileName, sizeConfig) {
+
+
+async function resizeByBlob(blob, sizeConfig) {
+    let finalBlob;
+
+    // Nếu có sizeConfig, thực hiện crop và resize
+    if (sizeConfig && sizeConfig.width && sizeConfig.height) {
+        const image = await createImageBitmap(blob);
+        const width = image.width;
+        const height = image.height;
+
+        console.log(`Ảnh gốc: Width=${width}, Height=${height}`);
+
+        // Tính toán tỷ lệ crop
+        const targetAspectRatio = sizeConfig.width / sizeConfig.height;
+        const sourceAspectRatio = width / height;
+
+        let cropWidth, cropHeight;
+
+        if (sourceAspectRatio > targetAspectRatio) {
+            // Ảnh gốc rộng hơn so với tỷ lệ mục tiêu
+            cropHeight = height;
+            cropWidth = cropHeight * targetAspectRatio;
+        } else {
+            // Ảnh gốc cao hơn hoặc bằng so với tỷ lệ mục tiêu
+            cropWidth = width;
+            cropHeight = cropWidth / targetAspectRatio;
+        }
+
+        // Đảm bảo crop không vượt quá kích thước gốc
+        cropWidth = Math.min(cropWidth, width);
+        cropHeight = Math.min(cropHeight, height);
+
+        // Tính toán offset để crop ở giữa
+        const offsetX = (width - cropWidth) / 2;
+        const offsetY = (height - cropHeight) / 2;
+
+        console.log(`Tính toán crop: OffsetX=${offsetX}, OffsetY=${offsetY}, Width=${cropWidth}, Height=${cropHeight}`);
+
+        // Tạo canvas để crop ảnh
+        const cropCanvas = document.createElement('canvas');
+        const cropCtx = cropCanvas.getContext('2d');
+        cropCanvas.width = cropWidth;
+        cropCanvas.height = cropHeight;
+
+        cropCtx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+        // Tạo canvas để resize ảnh
+        const resizeCanvas = document.createElement('canvas');
+        const resizeCtx = resizeCanvas.getContext('2d');
+        resizeCanvas.width = sizeConfig.width;
+        resizeCanvas.height = sizeConfig.height;
+
+        resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
+
+        // Chuyển canvas thành blob với định dạng và chất lượng tùy chọn
+        const mimeType = "image/webp"; // Hoặc "image/jpeg" nếu cần
+        const quality = 0.8; // Chất lượng nén (từ 0.0 đến 1.0)
+
+        finalBlob = await new Promise(resolve => 
+            resizeCanvas.toBlob(resolve, mimeType, quality)
+        );
+
+        console.log(`Ảnh đã được crop và resize: Width=${sizeConfig.width}, Height=${sizeConfig.height}`);
+        console.log(`Kích thước Blob mới: ${finalBlob.size} bytes`);
+
+        return finalBlob;
+    }
+
+    return finalBlob;
+}
+
+async function downloadImageViaProxy(url, fileName) {
     try {
         // Tải ảnh qua proxy
         const response = await fetch(proxyUrl + url);
         if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
         const blob = await response.blob();
+        var w = parseInt($("#input-width").val());
+        var h = parseInt($("#input-height").val());
+        var sizeConfig = undefined;
 
-         // Lấy kích thước từ input
-         var w = parseInt($("#input-width").val());
-         var h = parseInt($("#input-height").val());
-         var sizeConfig = undefined;
- 
-         if (w > 0 && h > 0) {
-             sizeConfig = {
-                 width: w,
-                 height: h
-             };
-         }
+        if (w > 0 && h > 0) {
+            sizeConfig = {
+                width: w,
+                height: h
+            };
+        }
 
-        let finalBlob = blob;
-
-        // Nếu có sizeConfig, thực hiện crop và resize
-        if (sizeConfig && sizeConfig.width && sizeConfig.height) {
-            const image = await createImageBitmap(blob);
-            const width = image.width;
-            const height = image.height;
-
-            console.log(`Ảnh gốc: Width=${width}, Height=${height}`);
-
-            // Tính toán tỷ lệ crop
-            const targetAspectRatio = sizeConfig.width / sizeConfig.height;
-            const sourceAspectRatio = width / height;
-
-            let cropWidth, cropHeight;
-
-            if (sourceAspectRatio > targetAspectRatio) {
-                // Ảnh gốc rộng hơn so với tỷ lệ mục tiêu
-                cropHeight = height;
-                cropWidth = cropHeight * targetAspectRatio;
-            } else {
-                // Ảnh gốc cao hơn hoặc bằng so với tỷ lệ mục tiêu
-                cropWidth = width;
-                cropHeight = cropWidth / targetAspectRatio;
-            }
-
-            // Đảm bảo crop không vượt quá kích thước gốc
-            cropWidth = Math.min(cropWidth, width);
-            cropHeight = Math.min(cropHeight, height);
-
-            // Tính toán offset để crop ở giữa
-            const offsetX = (width - cropWidth) / 2;
-            const offsetY = (height - cropHeight) / 2;
-
-            console.log(`Tính toán crop: OffsetX=${offsetX}, OffsetY=${offsetY}, Width=${cropWidth}, Height=${cropHeight}`);
-
-            // Tạo canvas để crop ảnh
-            const cropCanvas = document.createElement('canvas');
-            const cropCtx = cropCanvas.getContext('2d');
-            cropCanvas.width = cropWidth;
-            cropCanvas.height = cropHeight;
-
-            cropCtx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-            // Tạo canvas để resize ảnh
-            const resizeCanvas = document.createElement('canvas');
-            const resizeCtx = resizeCanvas.getContext('2d');
-            resizeCanvas.width = sizeConfig.width;
-            resizeCanvas.height = sizeConfig.height;
-
-            resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
-
-            // Chuyển canvas thành blob
-            finalBlob = await new Promise(resolve => resizeCanvas.toBlob(resolve));
-
-            console.log(`Ảnh đã được crop và resize: Width=${sizeConfig.width}, Height=${sizeConfig.height}`);
+        let finalBlob;
+        if (sizeConfig) {
+            finalBlob = await resizeByBlob(blob, sizeConfig);
+        } else {
+            finalBlob = await fetch(url).then((r) => {
+                if (r.status === 200) return r.blob();
+                return Promise.reject(new Error(r.statusText));
+            });
         }
 
         // Lưu ảnh đã xử lý
@@ -392,7 +447,7 @@ const downloadAll = async () => {
     var extent = strExtent = "";
 
     if (imgArr) {
-        for (let i = 0; i < imgArr.length; i++) { 
+        for (let i = 0; i < imgArr.length; i++) {
             extent = imgArr[i].split(".");
             strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
             strExtent = strExtent.split('?')[0];
@@ -406,16 +461,15 @@ const downloadAll = async () => {
 };
 
 const downloadZip = function () {
-    $("#spinner").removeClass("none"); 
+    $("#spinner").removeClass("none");
     var imgArr = arrImages;
     var filename = $("#input-filename-zip").val();
     var nombre = filename ? filename.trim() : "img_zip";
     var name = nombre + ".zip";
     saveZip(name, imgArr);
 }
- 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 
 const saveZip = async (filename, urls) => {
@@ -451,63 +505,16 @@ const saveZip = async (filename, urls) => {
             if (response.status === 200) {
                 const blob = await response.blob();
                 console.log(`Ảnh tải về thành công từ ${url}`);
-
                 const name = url.substring(url.lastIndexOf("/") + 1);
-                let finalBlob = blob;
 
-                if (sizeConfig && sizeConfig.width && sizeConfig.height) {
-                    const image = await createImageBitmap(blob);
-                    const width = image.width;
-                    const height = image.height;
-
-                    console.log(`Ảnh gốc: Width=${width}, Height=${height}`);
-
-                    // Tính toán tỷ lệ để crop kiểu contain
-                    const targetAspectRatio = sizeConfig.width / sizeConfig.height;
-                    const sourceAspectRatio = width / height;
-
-                    let cropWidth, cropHeight;
-
-                    if (sourceAspectRatio > targetAspectRatio) {
-                        // Ảnh gốc rộng hơn so với tỷ lệ mục tiêu
-                        cropHeight = height;
-                        cropWidth = cropHeight * targetAspectRatio;
-                    } else {
-                        // Ảnh gốc cao hơn hoặc bằng so với tỷ lệ mục tiêu
-                        cropWidth = width;
-                        cropHeight = cropWidth / targetAspectRatio;
-                    }
-
-                    // Đảm bảo crop không vượt quá kích thước gốc
-                    cropWidth = Math.min(cropWidth, width);
-                    cropHeight = Math.min(cropHeight, height);
-
-                    // Tính toán offset để crop ở giữa
-                    const offsetX = (width - cropWidth) / 2;
-                    const offsetY = (height - cropHeight) / 2;
-
-                    console.log(`Tính toán crop: OffsetX=${offsetX}, OffsetY=${offsetY}, Width=${cropWidth}, Height=${cropHeight}`);
-
-                    // Tạo canvas để crop ảnh
-                    const cropCanvas = document.createElement('canvas');
-                    const cropCtx = cropCanvas.getContext('2d');
-                    cropCanvas.width = cropWidth;
-                    cropCanvas.height = cropHeight;
-
-                    cropCtx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-                    // Tạo canvas để resize ảnh
-                    const resizeCanvas = document.createElement('canvas');
-                    const resizeCtx = resizeCanvas.getContext('2d');
-                    resizeCanvas.width = sizeConfig.width;
-                    resizeCanvas.height = sizeConfig.height;
-
-                    resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
-
-                    // Chuyển canvas thành blob
-                    finalBlob = await new Promise(resolve => resizeCanvas.toBlob(resolve));
-
-                    console.log(`Ảnh đã được crop và resize: Width=${sizeConfig.width}, Height=${sizeConfig.height}`);
+                let finalBlob;
+                if (sizeConfig) {
+                    finalBlob = await resizeByBlob(blob, sizeConfig);
+                } else {
+                    finalBlob = fetch(url).then((r) => {
+                        if (r.status === 200) return r.blob();
+                        return Promise.reject(new Error(r.statusText));
+                    });
                 }
 
                 if (fileNameImage && fileNameImage.length > 0) {
@@ -526,7 +533,7 @@ const saveZip = async (filename, urls) => {
         }
 
         $(".spinner-text").text("Đang chuẩn bị dữ liệu..." + "(" + (index + 1) + "/" + urls.length + ")");
-        
+
         if (proxyUrl.length > 0) {
             await delay(1000); // Delay 1 giây giữa mỗi yêu cầu
         }
@@ -586,7 +593,7 @@ function toogleClassActive(e) {
         e.target.classList.remove("active")
     } else {
         e.target.classList.add("active")
-    } 
+    }
 }
 
 
@@ -596,29 +603,29 @@ $(".nav-link").on("click", function () {
     $(this).addClass("active");
     var target = $(this).attr("data-target");
     $(".tab-pane").removeClass("active");
-    $(target).addClass("active"); 
+    $(target).addClass("active");
     dataConfig["tabActiveDefault"] = target;
     saveLocalConfig();
 })
 
-$(document).ready(function () { 
-    var dataConfigRaw = getLocalConfig(); 
+$(document).ready(function () {
+    var dataConfigRaw = getLocalConfig();
     if (dataConfigRaw) {
-        dataConfig = dataConfigRaw; 
-        for (const prop in dataConfig) { 
+        dataConfig = dataConfigRaw;
+        for (const prop in dataConfig) {
             switch (prop) {
                 case "tabActiveDefault":
                     $('.nav-link[data-target="' + dataConfig[prop] + '"]').click();
-                    break; 
+                    break;
                 case "check-reverse":
                 case "check-find-picture":
                     $('[data-field="' + prop + '"]').prop("checked", dataConfig[prop])
-                    break; 
+                    break;
                 default:
                     $('[data-field="' + prop + '"]').val(dataConfig[prop]);
                     break;
-            } 
-        }  
+            }
+        }
     }
 
     $("[data-field]").each(function () {
@@ -629,12 +636,12 @@ $(document).ready(function () {
             switch (type) {
                 case "checkbox":
                     dataConfig[field] = $(this).prop("checked");
-                    break; 
+                    break;
                 default:
                     dataConfig[field] = $(this).val();
                     break;
             }
-           
+
             saveLocalConfig();
         });
     })

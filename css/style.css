@@ -427,6 +427,19 @@ textarea::-webkit-scrollbar-thumb {
     background-color: #339736;
     color: #fff;
 }
+
+
+#image-list .img-item  .size-info{
+    display: block;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, .8);
+    color: #fff;
+    position: absolute;
+    left: 10px;
+    bottom: 40px;
+    text-align: left;
+}
 .textarea-html {
     width: 100%;
     min-height: 310px;
