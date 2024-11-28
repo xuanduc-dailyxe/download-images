@@ -19,7 +19,7 @@ var dataConfig = {
 var arrImages = [];
 
 function checkImageHTML() {
-    var urlHtml = $("#input-html").val();
+    var urlHtml = ace.edit("input-html").getValue();
     var inputRegex = $("#input-regex").val();
     var removeParams = $("#check-remove-params");
     var urlPage = $("#input-domain").val();
@@ -207,6 +207,9 @@ function formatNumberToString(number) {
 }
 
 async function buildHtmlImages(imgArr) {
+    $("#image-list .img-item .btn-delete").off("click");
+    $("#image-list .img-item .btn-download").off("click");
+
     if (imgArr && imgArr.length > 0) {
         $("#input-list-img,#url-list,#image-list").html("");
         if (!isValidUrl(imgArr[0])) {
@@ -235,7 +238,7 @@ async function buildHtmlImages(imgArr) {
         } else {
             arrImages = imgArr;
         }
-        var sizeInfo, response,blob,finalBlob, image, width, height, imageUrl, sizeInKB;
+        var sizeInfo, response, blob, finalBlob, image, width, height, imageUrl, sizeInKB;
         for (let i = 0; i < arrImages.length; i++) {
             fileName = "";
             arrStr = arrImages[i].trim().split("/");
@@ -244,7 +247,7 @@ async function buildHtmlImages(imgArr) {
             if (fileNameImage && fileNameImage.length > 0) {
 
                 response = await fetch(proxyUrl + arrImages[i].trim());
-                if (!response.ok){
+                if (!response.ok) {
                     continue;
                 }
                 blob = await response.blob();
@@ -264,7 +267,7 @@ async function buildHtmlImages(imgArr) {
                 height = image.height;
                 sizeInKB = finalBlob.size / 1024;
                 sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
-                
+
 
                 if (fileExtention && fileExtention.length > 0) {
                     $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
@@ -292,13 +295,14 @@ async function buildHtmlImages(imgArr) {
             var extent = arrImages[index].split(".");
             var strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
             strExtent = strExtent.split('?')[0];
-            downloadImageViaProxy(arrImages[index], `${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`);
+            downloadImage(arrImages[index], `${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`);
             $("#spinner").addClass("none");
         })
 
         $("#number-img").html("(" + arrImages.length + " hình)");
         $("#url-list").html(arrImages.toString().replaceAll(",", ",&#13;&#10;"));
-        $("#image-list-container").css("opacity", "1");
+
+        $(".image-list-container").css("opacity", "1");
         $(".btn-download").removeClass("disabled");
     }
 }
@@ -324,125 +328,8 @@ function getLocalConfig() {
         return JSON.parse(dataConfigRaw);
     }
 }
-
-$("#input-filename").on("change", function () {
-    dataConfig.filename = $(this).val();
-    saveLocalConfig();
-    buildHtmlImages(arrImages);
-});
-
-$("#check-reverse").on("change", function () {
-    buildHtmlImages(arrImages);
-});
-
-const timer = ms => new Promise(res => setTimeout(res, ms))
-
-
-async function resizeByBlob(blob, sizeConfig) {
-    let finalBlob;
-
-    // Nếu có sizeConfig, thực hiện crop và resize
-    if (sizeConfig && sizeConfig.width && sizeConfig.height) {
-        const image = await createImageBitmap(blob);
-        const width = image.width;
-        const height = image.height;
-
-        console.log(`Ảnh gốc: Width=${width}, Height=${height}`);
-
-        // Tính toán tỷ lệ crop
-        const targetAspectRatio = sizeConfig.width / sizeConfig.height;
-        const sourceAspectRatio = width / height;
-
-        let cropWidth, cropHeight;
-
-        if (sourceAspectRatio > targetAspectRatio) {
-            // Ảnh gốc rộng hơn so với tỷ lệ mục tiêu
-            cropHeight = height;
-            cropWidth = cropHeight * targetAspectRatio;
-        } else {
-            // Ảnh gốc cao hơn hoặc bằng so với tỷ lệ mục tiêu
-            cropWidth = width;
-            cropHeight = cropWidth / targetAspectRatio;
-        }
-
-        // Đảm bảo crop không vượt quá kích thước gốc
-        cropWidth = Math.min(cropWidth, width);
-        cropHeight = Math.min(cropHeight, height);
-
-        // Tính toán offset để crop ở giữa
-        const offsetX = (width - cropWidth) / 2;
-        const offsetY = (height - cropHeight) / 2;
-
-        console.log(`Tính toán crop: OffsetX=${offsetX}, OffsetY=${offsetY}, Width=${cropWidth}, Height=${cropHeight}`);
-
-        // Tạo canvas để crop ảnh
-        const cropCanvas = document.createElement('canvas');
-        const cropCtx = cropCanvas.getContext('2d');
-        cropCanvas.width = cropWidth;
-        cropCanvas.height = cropHeight;
-
-        cropCtx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-        // Tạo canvas để resize ảnh
-        const resizeCanvas = document.createElement('canvas');
-        const resizeCtx = resizeCanvas.getContext('2d');
-        resizeCanvas.width = sizeConfig.width;
-        resizeCanvas.height = sizeConfig.height;
-
-        resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
-
-        // Chuyển canvas thành blob với định dạng và chất lượng tùy chọn
-        const mimeType = "image/webp"; // Hoặc "image/jpeg" nếu cần
-        const quality = 0.8; // Chất lượng nén (từ 0.0 đến 1.0)
-
-        finalBlob = await new Promise(resolve => 
-            resizeCanvas.toBlob(resolve, mimeType, quality)
-        );
-
-        console.log(`Ảnh đã được crop và resize: Width=${sizeConfig.width}, Height=${sizeConfig.height}`);
-        console.log(`Kích thước Blob mới: ${finalBlob.size} bytes`);
-
-        return finalBlob;
-    }
-
-    return finalBlob;
-}
-
-async function downloadImageViaProxy(url, fileName) {
-    try {
-        // Tải ảnh qua proxy
-        const response = await fetch(proxyUrl + url);
-        if (!response.ok){
-            return;
-        }
-        const blob = await response.blob();
-        var w = parseInt($("#input-width").val());
-        var h = parseInt($("#input-height").val());
-        var sizeConfig = undefined;
-
-        if (w > 0 && h > 0) {
-            sizeConfig = {
-                width: w,
-                height: h
-            };
-        }
-
-        let finalBlob;
-        if (sizeConfig) {
-            finalBlob = await resizeByBlob(blob, sizeConfig);
-        } else {
-            finalBlob = await fetch(url).then((r) => {
-                if (r.status === 200) return r.blob();
-                return Promise.reject(new Error(r.statusText));
-            });
-        }
-
-        // Lưu ảnh đã xử lý
-        saveAs(finalBlob, fileName);
-    } catch (error) {
-        console.error('Error downloading image:', error);
-    }
-}
+ 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const downloadAll = async () => {
     let link = document.createElement("a");
@@ -458,8 +345,8 @@ const downloadAll = async () => {
             extent = imgArr[i].split(".");
             strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
             strExtent = strExtent.split('?')[0];
-            downloadImageViaProxy(imgArr[i], `${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention ? fileExtention : strExtent}`);
-            await timer(500);
+            downloadImage(imgArr[i], `${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention ? fileExtention : strExtent}`);
+            await delay(500);
         }
     } else {
         alert("Không có dữ liệu");
@@ -475,9 +362,6 @@ const downloadZip = function () {
     var name = nombre + ".zip";
     saveZip(name, imgArr);
 }
-
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 
 const saveZip = async (filename, urls) => {
     if (!urls) return;
@@ -556,44 +440,148 @@ const saveZip = async (filename, urls) => {
     });
 };
 
+async function resizeByBlob(blob, sizeConfig) {
+    let finalBlob;
+    // Nếu có sizeConfig, thực hiện crop và resize
+    if (sizeConfig && sizeConfig.width && sizeConfig.height) {
+        const image = await createImageBitmap(blob);
+        const width = image.width;
+        const height = image.height;
 
-WebPDecodeAndDraw = function (data) {
-    var decoder = new WebPDecoder();
-    var bitmap = decoder.WebPDecode(data, data.length);
-    var dataURL;
-    if (bitmap) {
-        //Draw Image
-        var output = ctx.createImageData(canvas.width, canvas.height);
-        var biWidth = canvas.width;
-        var outputData = output.data;
-        for (var h = 0; h < canvas.height; h++) {
-            for (var w = 0; w < canvas.width; w++) {
-                outputData[0 + w * 4 + (biWidth * 4) * h] = bitmap[0 + w * 4 + (biWidth * 4) * h];
-                outputData[1 + w * 4 + (biWidth * 4) * h] = bitmap[1 + w * 4 + (biWidth * 4) * h];
-                outputData[2 + w * 4 + (biWidth * 4) * h] = bitmap[2 + w * 4 + (biWidth * 4) * h];
-                outputData[3 + w * 4 + (biWidth * 4) * h] = bitmap[3 + w * 4 + (biWidth * 4) * h];
+        console.log(`Ảnh gốc: Width=${width}, Height=${height}`);
+
+        // Tính toán tỷ lệ crop
+        const targetAspectRatio = sizeConfig.width / sizeConfig.height;
+        const sourceAspectRatio = width / height;
+
+        let cropWidth, cropHeight;
+
+        if (sourceAspectRatio > targetAspectRatio) {
+            // Ảnh gốc rộng hơn so với tỷ lệ mục tiêu
+            cropHeight = height;
+            cropWidth = cropHeight * targetAspectRatio;
+        } else {
+            // Ảnh gốc cao hơn hoặc bằng so với tỷ lệ mục tiêu
+            cropWidth = width;
+            cropHeight = cropWidth / targetAspectRatio;
+        }
+
+        // Đảm bảo crop không vượt quá kích thước gốc
+        cropWidth = Math.min(cropWidth, width);
+        cropHeight = Math.min(cropHeight, height);
+
+        // Tính toán offset để crop ở giữa
+        const offsetX = (width - cropWidth) / 2;
+        const offsetY = (height - cropHeight) / 2;
+
+        console.log(`Tính toán crop: OffsetX=${offsetX}, OffsetY=${offsetY}, Width=${cropWidth}, Height=${cropHeight}`);
+
+        // Tạo canvas để crop ảnh
+        const cropCanvas = document.createElement('canvas');
+        const cropCtx = cropCanvas.getContext('2d');
+        cropCanvas.width = cropWidth;
+        cropCanvas.height = cropHeight;
+
+        cropCtx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+        // Tạo canvas để resize ảnh
+        const resizeCanvas = document.createElement('canvas');
+        const resizeCtx = resizeCanvas.getContext('2d');
+        resizeCanvas.width = sizeConfig.width;
+        resizeCanvas.height = sizeConfig.height;
+
+        resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
+ 
+        const watermarkConfig = {
+            base64: dataConfig["input-file-watermark"],
+            width: parseInt(dataConfig["input-width-watermark"]), // Chiều rộng watermark
+            position: { 
+                top: parseInt(dataConfig["input-top-watermark"]), 
+                right: parseInt(dataConfig["input-right-watermark"]),
+                bottom: parseInt(dataConfig["input-bottom-watermark"]),
+                left: parseInt(dataConfig["input-left-watermark"]) 
+            } // Vị trí watermark
+        }; 
+
+        if (dataConfig["check-watermark"] && watermarkConfig && watermarkConfig.base64) {
+            const watermarkBase64 = watermarkConfig.base64;
+            const watermarkBlob = await fetch(watermarkBase64).then(res => res.blob());
+            const watermarkImage = await createImageBitmap(watermarkBlob);
+
+            // Tính toán kích thước watermark
+            const watermarkWidth = watermarkConfig.width || 150; // Chiều rộng mặc định
+            const aspectRatio = watermarkImage.width / watermarkImage.height;
+            const watermarkHeight = watermarkWidth / aspectRatio;
+
+            // Tính toán vị trí watermark
+            const position = watermarkConfig.position || {};
+            const top = position.top > 0 ? position.top : (position.bottom > 0 ? resizeCtx.canvas.height - watermarkHeight - position.bottom : 20);
+            const left = position.left > 0 ? position.left : (position.right > 0 ? resizeCtx.canvas.width - watermarkWidth - position.right : 20);
+
+            console.log(`Chèn watermark tại vị trí: Top=${top}, Left=${left}, Width=${watermarkWidth}, Height=${watermarkHeight}`);
+
+            // Chèn watermark vào ảnh
+            resizeCtx.drawImage(
+                watermarkImage,
+                left,
+                top,
+                watermarkWidth,
+                watermarkHeight
+            );
+        }
+
+        // Chuyển canvas thành blob với định dạng và chất lượng tùy chọn
+        const mimeType = "image/jpeg"; // Hoặc "image/jpeg" nếu cần
+        const quality = 0.8; // Chất lượng nén (từ 0.0 đến 1.0)
+
+        finalBlob = await new Promise(resolve =>
+            resizeCanvas.toBlob(resolve, mimeType, quality)
+        );
+
+        console.log(`Ảnh đã được crop và resize: Width=${sizeConfig.width}, Height=${sizeConfig.height}`);
+        console.log(`Kích thước Blob mới: ${finalBlob.size} bytes`);
+
+        return finalBlob;
+    }
+
+    return finalBlob;
+} 
+
+async function downloadImage(url, fileName) {
+    try {
+        // Tải ảnh qua proxy
+        const response = await fetch(proxyUrl + url);
+        if (!response.ok) {
+            return;
+        }
+        const blob = await response.blob();
+        var w = parseInt($("#input-width").val());
+        var h = parseInt($("#input-height").val());
+        var sizeConfig = undefined;
+
+        if (w > 0 && h > 0) {
+            sizeConfig = {
+                width: w,
+                height: h
             };
         }
-        ctx.putImageData(output, 0, 0);
-        dataURL = canvas.toDataURL("image/png");
-        return dataURL;
+
+        let finalBlob;
+        if (sizeConfig) {
+            finalBlob = await resizeByBlob(blob, sizeConfig);
+        } else {
+            finalBlob = await fetch(url).then((r) => {
+                if (r.status === 200) return r.blob();
+                return Promise.reject(new Error(r.statusText));
+            });
+        }
+
+        // Lưu ảnh đã xử lý
+        saveAs(finalBlob, fileName);
+    } catch (error) {
+        console.error('Error downloading image:', error);
     }
-    return dataURL;
-};
-
-
-function getImage(img) {
-    // Create an empty canvas element
-    canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    // Copy the image contents to the canvas
-    ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    return WebPDecodeAndDraw(ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)['data']);
 }
-
 
 function toogleClassActive(e) {
     if (e.target.classList.contains('active')) {
@@ -603,19 +591,25 @@ function toogleClassActive(e) {
     }
 }
 
+function formatHtml(code) {
+    return html_beautify(code, { indent_size: 2, wrap_line_length: 80 })
+}
 
+$(document).ready(function () { 
+    $("#check-reverse").on("change", function () {
+        buildHtmlImages(arrImages);
+    });
 
-$(".nav-link").on("click", function () {
-    $(".nav-link").removeClass("active");
-    $(this).addClass("active");
-    var target = $(this).attr("data-target");
-    $(".tab-pane").removeClass("active");
-    $(target).addClass("active");
-    dataConfig["tabActiveDefault"] = target;
-    saveLocalConfig();
-})
+    $(".nav-link").on("click", function () {
+        $(".nav-link").removeClass("active");
+        $(this).addClass("active");
+        var target = $(this).attr("data-target");
+        $(".tab-pane").removeClass("active");
+        $(target).addClass("active");
+        dataConfig["tabActiveDefault"] = target;
+        saveLocalConfig();
+    })
 
-$(document).ready(function () {
     var dataConfigRaw = getLocalConfig();
     if (dataConfigRaw) {
         dataConfig = dataConfigRaw;
@@ -624,9 +618,16 @@ $(document).ready(function () {
                 case "tabActiveDefault":
                     $('.nav-link[data-target="' + dataConfig[prop] + '"]').click();
                     break;
+                case "check-watermark":
                 case "check-reverse":
                 case "check-find-picture":
                     $('[data-field="' + prop + '"]').prop("checked", dataConfig[prop])
+                    break;
+                case "input-html":
+                    ace.edit("input-html").setValue(formatHtml(dataConfig[prop]), -1);
+                    break;
+                case "input-file-watermark":
+                    $('#preview-watermark').attr("src",dataConfig[prop]);
                     break;
                 default:
                     $('[data-field="' + prop + '"]').val(dataConfig[prop]);
@@ -644,12 +645,42 @@ $(document).ready(function () {
                 case "checkbox":
                     dataConfig[field] = $(this).prop("checked");
                     break;
+                case "input-file-watermark": 
+                    break; 
                 default:
                     dataConfig[field] = $(this).val();
                     break;
             }
-
             saveLocalConfig();
         });
     })
+
+
+    const editor = ace.edit("input-html");
+    editor.resize();
+    editor.session.setMode("ace/mode/html"); // Thiết lập chế độ ngôn ngữ
+
+
+    // Setting
+    const imageInput = document.getElementById('input-file-watermark');
+    const previewImage = document.getElementById('preview-watermark');
+
+    // Lắng nghe sự kiện thay đổi của input file
+    imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0]; // Lấy file đầu tiên từ input
+        if (file) {
+            const reader = new FileReader(); // Tạo FileReader để đọc file
+
+            // Khi FileReader load xong
+            reader.onload = (e) => {
+                const base64Image = e.target.result;
+                previewImage.src = base64Image; // Gán src của thẻ img bằng kết quả đọc file
+                previewImage.style.display = 'block'; // Hiển thị thẻ img
+                dataConfig["input-file-watermark"] = base64Image;
+                saveLocalConfig();
+            };
+
+            reader.readAsDataURL(file); // Đọc file dưới dạng Data URL
+        }
+    });
 })
