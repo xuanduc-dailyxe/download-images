@@ -194,25 +194,31 @@
                 <div class="box-config">
                     <div class="row">
                         <div class="col-2 mb-4" > 
-                            <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Width (px)</span> 
+                            <span class="label">Width (px)</span> 
                             <input class="form-control mr-1" style="text-align: right;" id="input-width" data-field="input-width" type="number" value="" placeholder="Nhập width..." />   
                         </div> 
                         <div class="col-2 mb-4" > 
-                            <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Height (px)</span> 
+                            <span class="label">Height (px)</span> 
                             <input class="form-control mr-1" style="text-align: right;" id="input-height" data-field="input-height" type="number" value="" placeholder="Nhập height..." />   
-                        </div> 
-                        
-                        <div class="col-4 mb-4"> 
-                            <span class="label" style="width: 100px; flex-shrink: 0; text-align: left; margin-right: 10px;">Extention</span>
+                        </div>  
+                        <div class="col-2 mb-4"> 
+                            <span class="label">Extention</span>
                             <input class="form-control mr-1" style="text-align: right;" id="input-extention"  data-field="input-extention" type="text" value="" placeholder="Nhập jpg,jpeg,png..." /> 
                         </div> 
-                        
-                        <div class="col-4 mb-4">
+                        <div class="col-3 mb-4"> 
+                            <span class="label">ReplaceParams From</span>
+                            <input class="form-control mr-1" style="text-align: right;" id="input-replace-params-from"  data-field="input-replace-params-from" type="text" value="" placeholder="Nhập params cần replace..." /> 
+                        </div> 
+                        <div class="col-3 mb-4"> 
+                            <span class="label">ReplaceParams To</span>
+                            <input class="form-control mr-1" style="text-align: right;" id="input-replace-params-to"  data-field="input-replace-params-to" type="text" value="" placeholder="Nhập params replace..." /> 
+                        </div> 
+                        <div class="col-3 mb-4">
                             <span class="label">Tùy chọn</span> 
                             <div style="display: flex; align-items: center; height: 50px;">
                                 <div class="btn-group">
                                     <input class="form-control mr-1" id="check-remove-params" data-field="check-remove-params" type="checkbox" />
-                                    <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Loại bỏ params hình</span>
+                                    <span class="label" style="flex-shrink: 0; text-align: right; margin-right: 10px;">Loại bỏ params</span>
                                 </div>
                                 <div class="btn-group">
                                     <input class="form-control mr-1" id="check-reverse" data-field="check-reverse" type="checkbox" />
@@ -220,14 +226,14 @@
                                 </div>
                             </div> 
                         </div> 
-                        <div class="col-4"> 
+                        <div class="col-3"> 
                             <span class="label" style="width: 100px;flex-shrink: 0; text-align: left; margin-right: 10px;">Tên file hình</span>
                                 <div class="btn-group">
                                 <input class="form-control mr-1" style="text-align: right;" id="input-filename" data-field="input-filename" type="text" value="" placeholder="Nhập tên file (name-{index}.jpg)..." />
                                 <span style="width: 90px;flex-shrink: 0;">-{index}.<span id="label-extention">jpg</span></span>
                             </div>
                         </div>
-                        <div class="col-4"> 
+                        <div class="col-2"> 
                             <span class="label" style=" flex-shrink: 0; text-align: right; margin-right: 10px;">Tên file nén</span>
                             <div class="btn-group">
                                 <input class="form-control mr-1" style="text-align: right;" id="input-filename-zip" data-field="input-filename-zip" type="text" value="img_zip" placeholder="Nhập tên file (name.zip)..." />

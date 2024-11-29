@@ -33,6 +33,9 @@ function checkImageHTML() {
     var arrayFlash;
     var regex = inputRegex && inputRegex.length > 0 ? new RegExp(inputRegex, 'g') : null;
 
+    var repalceParamsFrom = dataConfig["input-replace-params-from"];
+    var repalceParamsTo = dataConfig["input-replace-params-to"];
+
     imgTags.each(function (index, item) {
         datasrc = $(this).attr("data-src");
         src = $(this).attr("src");
@@ -43,6 +46,11 @@ function checkImageHTML() {
             } else {
                 url = datasrc ? datasrc : (srcset ? srcset : src);
             }
+            url = url.split(' ')[0];
+            if(repalceParamsFrom && repalceParamsTo && repalceParamsTo.length > 0 && repalceParamsTo.length > 0){
+                url = url.replaceAll(repalceParamsFrom,repalceParamsTo);
+            }
+           
             arrayFlash = url.split('/');
             filename = arrayFlash[arrayFlash.length - 1];
 
@@ -492,14 +500,18 @@ async function resizeByBlob(blob, sizeConfig) {
 
         resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
  
+        const topWatermark = parseInt(dataConfig["input-top-watermark"]);
+        const rightWatermark = parseInt(dataConfig["input-right-watermark"]);
+        const bottomWatermark = parseInt(dataConfig["input-bottom-watermark"]); 
+        const leftWatermark = parseInt(dataConfig["input-left-watermark"]);
         const watermarkConfig = {
             base64: dataConfig["input-file-watermark"],
             width: parseInt(dataConfig["input-width-watermark"]), // Chiều rộng watermark
             position: { 
-                top: parseInt(dataConfig["input-top-watermark"]), 
-                right: parseInt(dataConfig["input-right-watermark"]),
-                bottom: parseInt(dataConfig["input-bottom-watermark"]),
-                left: parseInt(dataConfig["input-left-watermark"]) 
+                top: topWatermark, 
+                right: rightWatermark,
+                bottom: bottomWatermark,
+                left: leftWatermark 
             } // Vị trí watermark
         }; 
 
@@ -663,6 +675,10 @@ $(document).ready(function () {
     editor.resize();
     editor.session.setMode("ace/mode/html"); // Thiết lập chế độ ngôn ngữ
 
+    editor.session.on('change', function() {
+        dataConfig["input-html"] = editor.getValue(); 
+        saveLocalConfig();
+    });
 
     // Setting
     const imageInput = document.getElementById('input-file-watermark');
