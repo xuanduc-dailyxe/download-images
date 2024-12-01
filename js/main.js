@@ -1,6 +1,6 @@
 //const proxyUrl = 'https://api.allorigins.win/raw?url='; 
 const proxyUrl = '';
-
+var finalBlobs = [];
 var dataConfig = {
     tabActiveDefault: "#tab-content-1",
     urlPage: "",
@@ -47,10 +47,11 @@ function checkImageHTML() {
                 url = datasrc ? datasrc : (srcset ? srcset : src);
             }
             url = url.split(' ')[0];
-            if(repalceParamsFrom && repalceParamsTo && repalceParamsTo.length > 0 && repalceParamsTo.length > 0){
-                url = url.replaceAll(repalceParamsFrom,repalceParamsTo);
+            url = url.split(',')[0];
+            if (repalceParamsFrom && repalceParamsTo && repalceParamsTo.length > 0 && repalceParamsTo.length > 0) {
+                url = url.replaceAll(repalceParamsFrom, repalceParamsTo);
             }
-           
+
             arrayFlash = url.split('/');
             filename = arrayFlash[arrayFlash.length - 1];
 
@@ -183,6 +184,8 @@ function checkImagePage() {
                     } else {
                         url = datasrc ? datasrc : (srcset ? srcset : src);
                     }
+                    url = url.split(' ')[0];
+                    url = url.split(',')[0];
                     if (url && !url.startsWith('data:image') && isValidUrl(url)) {
                         imgArr.push(url);
                     } else {
@@ -233,7 +236,6 @@ async function buildHtmlImages(imgArr) {
         var w = parseInt($("#input-width").val());
         var h = parseInt($("#input-height").val());
         var sizeConfig = undefined;
-
         if (w > 0 && h > 0) {
             sizeConfig = {
                 width: w,
@@ -253,46 +255,53 @@ async function buildHtmlImages(imgArr) {
             fileName = arrStr[arrStr.length - 1];
             fileName = fileName.split('?')[0];
             if (fileNameImage && fileNameImage.length > 0) {
+                try {
+                    response = await fetch(proxyUrl + arrImages[i].trim());
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
 
-                response = await fetch(proxyUrl + arrImages[i].trim());
-                if (!response.ok) {
+                    blob = await response.blob();
+                    if (sizeConfig) {
+                        finalBlob = await resizeByBlob(blob, sizeConfig);
+                    } else {
+                        finalBlob = await fetch(arrImages[i].trim()).then((r) => {
+                            if (r.status === 200) return r.blob();
+                            return Promise.reject(new Error(r.statusText));
+                        });
+                    }
+                    finalBlobs.push(finalBlob);
+                    imageUrl = URL.createObjectURL(finalBlob);
+                    image = await createImageBitmap(finalBlob);
+                    width = image.width;
+                    height = image.height;
+                    sizeInKB = finalBlob.size / 1024;
+                    sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
+
+                    if (fileExtention && fileExtention.length > 0) {
+                        $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
+                    } else {
+                        extent = fileName.split(".");
+                        strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
+                        strExtent = strExtent.split('?')[0];
+                        $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
+                        $("#label-extention").text(strExtent);
+                    }
+
+                } catch (error) {
+                    showMessage(`Không thể tải hình ảnh. <br> ${arrImages[i]}  <br> Có thể do lỗi CORS hoặc URL không hợp lệ.`);
                     continue;
-                }
-                blob = await response.blob();
-
-                if (sizeConfig) {
-                    finalBlob = await resizeByBlob(blob, sizeConfig);
-                } else {
-                    finalBlob = await fetch(arrImages[i].trim()).then((r) => {
-                        if (r.status === 200) return r.blob();
-                        return Promise.reject(new Error(r.statusText));
-                    });
-                }
-                console.log("finalBlob", finalBlob);
-                imageUrl = URL.createObjectURL(finalBlob);
-                image = await createImageBitmap(finalBlob);
-                width = image.width;
-                height = image.height;
-                sizeInKB = finalBlob.size / 1024;
-                sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
-
-
-                if (fileExtention && fileExtention.length > 0) {
-                    $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
-                } else {
-                    extent = fileName.split(".");
-                    strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-                    strExtent = strExtent.split('?')[0];
-                    $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
-                    $("#label-extention").text(strExtent);
                 }
             } else {
                 $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileName}</span></div>`);
             }
         }
+
+
         $("#image-list .img-item .btn-delete").on("click", function () {
             var index = $(this).closest(".img-item").index();
             arrImages.splice(index, 1);
+            finalBlobs.splice(index, 1);
             $(".img-item").eq(index).remove();
         })
 
@@ -313,6 +322,27 @@ async function buildHtmlImages(imgArr) {
         $(".image-list-container").css("opacity", "1");
         $(".btn-download").removeClass("disabled");
     }
+}
+
+function showMessage(str) {
+    if (str) {
+        $(".message .close").off();
+        if ($(".message").length > 0) {
+            $(".message .content").html(`${str}`);
+        } else {
+            $("body").append(`<div class="message"> 
+                <div class="message-content">
+                <button class="close"><span class="material-symbols-rounded">close</span></button>
+                    <span class="material-symbols-rounded">info</span>
+                    <p class="content">${str}</p>
+                </div>
+            </div>`);
+        }
+        $(".message .close").on("click", function () {
+            $("body>.message").remove();
+        })
+    }
+
 }
 
 function isValidUrl(string) {
@@ -336,7 +366,7 @@ function getLocalConfig() {
         return JSON.parse(dataConfigRaw);
     }
 }
- 
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const downloadAll = async () => {
@@ -380,63 +410,20 @@ const saveZip = async (filename, urls) => {
     var fileNameImage = $("#input-filename").val();
     var fileExtention = $('#input-extention').val();
     var extent = strExtent = "";
-    var w = parseInt($("#input-width").val());
-    var h = parseInt($("#input-height").val());
-    var sizeConfig = undefined;
-
-    if (w > 0 && h > 0) {
-        sizeConfig = {
-            width: w,
-            height: h
-        };
-    }
-
-    for (const [index, url] of urls.entries()) {
-        var proxiedUrl;
-        if (proxyUrl.length > 0) {
-            proxiedUrl = `${proxyUrl}${encodeURIComponent(url)}`;
+    var name = "";
+    $.each(finalBlobs, function (index, finalBlob) {
+        $(".spinner-text").text("Đang chuẩn bị dữ liệu..." + "(" + (index + 1) + "/" + finalBlobs.length + ")");
+        if (arrImages && arrImages[index] && arrImages[index].split(".")) {
+            name = arrImages[index].split(".")[0];
+        }
+        if (fileNameImage && fileNameImage.length > 0) {
+            strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
+            strExtent = strExtent.split('?')[0];
+            folder.file(`${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`, finalBlob);
         } else {
-            proxiedUrl = url;
+            folder.file(`${name}`, finalBlob);
         }
-
-        try {
-            const response = await fetch(proxiedUrl);
-            if (response.status === 200) {
-                const blob = await response.blob();
-                console.log(`Ảnh tải về thành công từ ${url}`);
-                const name = url.substring(url.lastIndexOf("/") + 1);
-
-                let finalBlob;
-                if (sizeConfig) {
-                    finalBlob = await resizeByBlob(blob, sizeConfig);
-                } else {
-                    finalBlob = fetch(url).then((r) => {
-                        if (r.status === 200) return r.blob();
-                        return Promise.reject(new Error(r.statusText));
-                    });
-                }
-
-                if (fileNameImage && fileNameImage.length > 0) {
-                    extent = name.split(".");
-                    strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-                    strExtent = strExtent.split('?')[0];
-                    folder.file(`${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`, finalBlob);
-                } else {
-                    folder.file(`${name}`, finalBlob);
-                }
-            } else {
-                console.error(`Lỗi khi tải ảnh từ ${url}: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error('Error fetching image:', error);
-        }
-
-        $(".spinner-text").text("Đang chuẩn bị dữ liệu..." + "(" + (index + 1) + "/" + urls.length + ")");
-
-        if (proxyUrl.length > 0) {
-            await delay(1000); // Delay 1 giây giữa mỗi yêu cầu
-        }
-    }
+    })
 
     zip.generateAsync({ type: "blob" }, function updateCallback(metadata) {
         $(".spinner .value").text(Math.round(metadata.percent, 0) + "%");
@@ -499,21 +486,21 @@ async function resizeByBlob(blob, sizeConfig) {
         resizeCanvas.height = sizeConfig.height;
 
         resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
- 
+
         const topWatermark = parseInt(dataConfig["input-top-watermark"]);
         const rightWatermark = parseInt(dataConfig["input-right-watermark"]);
-        const bottomWatermark = parseInt(dataConfig["input-bottom-watermark"]); 
+        const bottomWatermark = parseInt(dataConfig["input-bottom-watermark"]);
         const leftWatermark = parseInt(dataConfig["input-left-watermark"]);
         const watermarkConfig = {
             base64: dataConfig["input-file-watermark"],
             width: parseInt(dataConfig["input-width-watermark"]), // Chiều rộng watermark
-            position: { 
-                top: topWatermark, 
+            position: {
+                top: topWatermark,
                 right: rightWatermark,
                 bottom: bottomWatermark,
-                left: leftWatermark 
+                left: leftWatermark
             } // Vị trí watermark
-        }; 
+        };
 
         if (dataConfig["check-watermark"] && watermarkConfig && watermarkConfig.base64) {
             const watermarkBase64 = watermarkConfig.base64;
@@ -557,7 +544,7 @@ async function resizeByBlob(blob, sizeConfig) {
     }
 
     return finalBlob;
-} 
+}
 
 async function downloadImage(url, fileName) {
     try {
@@ -607,7 +594,7 @@ function formatHtml(code) {
     return html_beautify(code, { indent_size: 2, wrap_line_length: 80 })
 }
 
-$(document).ready(function () { 
+$(document).ready(function () {
     $("#check-reverse").on("change", function () {
         buildHtmlImages(arrImages);
     });
@@ -639,7 +626,7 @@ $(document).ready(function () {
                     ace.edit("input-html").setValue(formatHtml(dataConfig[prop]), -1);
                     break;
                 case "input-file-watermark":
-                    $('#preview-watermark').attr("src",dataConfig[prop]);
+                    $('#preview-watermark').attr("src", dataConfig[prop]);
                     break;
                 default:
                     $('[data-field="' + prop + '"]').val(dataConfig[prop]);
@@ -657,10 +644,10 @@ $(document).ready(function () {
                 case "checkbox":
                     dataConfig[field] = $(this).prop("checked");
                     break;
-                case "input-file-watermark": 
-                    break; 
+                case "input-file-watermark":
+                    break;
                 case "input-html":
-                    dataConfig[field] = $(this).getValue(); 
+                    dataConfig[field] = $(this).getValue();
                     break;
                 default:
                     dataConfig[field] = $(this).val();
@@ -675,8 +662,8 @@ $(document).ready(function () {
     editor.resize();
     editor.session.setMode("ace/mode/html"); // Thiết lập chế độ ngôn ngữ
 
-    editor.session.on('change', function() {
-        dataConfig["input-html"] = editor.getValue(); 
+    editor.session.on('change', function () {
+        dataConfig["input-html"] = editor.getValue();
         saveLocalConfig();
     });
 
