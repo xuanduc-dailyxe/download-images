@@ -463,6 +463,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 #image-list .img-item .btn-delete {
+    display: none;
     position: absolute;
     top: 10px;
     right: 10px;
@@ -470,8 +471,7 @@ textarea::-webkit-scrollbar-thumb {
     height: 25px;
     border-radius: 50%;
     background-color: #88888896;
-    color: #fff;
-    display: flex;
+    color: #fff; 
     align-items: center;
     justify-content: center;
 }
@@ -488,7 +488,7 @@ textarea::-webkit-scrollbar-thumb {
     height: 40px;
     background-color: #4CAF50;
     color: #fff;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
 }
@@ -499,6 +499,10 @@ textarea::-webkit-scrollbar-thumb {
     margin-right: 0px;
 }
 
+#image-list.loaded .img-item .btn-download,
+#image-list.loaded .img-item .btn-delete{
+    display: flex;
+}
 #image-list .img-item .btn-download:hover {
     background-color: #339736;
     color: #fff;

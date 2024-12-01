@@ -222,6 +222,7 @@ async function buildHtmlImages(imgArr) {
     $("#image-list .img-item .btn-download").off("click");
 
     if (imgArr && imgArr.length > 0) {
+        $("#image-list").removeClass("loaded");
         $("#input-list-img,#url-list,#image-list").html("");
         if (!isValidUrl(imgArr[0])) {
             alert("Có lỗi ở dữ liệu đầu vào. Vui lòng kiểm tra lại!");
@@ -296,7 +297,7 @@ async function buildHtmlImages(imgArr) {
                 $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileName}</span></div>`);
             }
         }
-
+        $("#image-list").addClass("loaded");
 
         $("#image-list .img-item .btn-delete").on("click", function () {
             var index = $(this).closest(".img-item").index();
@@ -439,6 +440,7 @@ async function resizeByBlob(blob, sizeConfig) {
     let finalBlob;
     // Nếu có sizeConfig, thực hiện crop và resize
     if (sizeConfig && sizeConfig.width && sizeConfig.height) {
+        const inputExtention = $("#input-extention").val();
         const image = await createImageBitmap(blob);
         const width = image.width;
         const height = image.height;
@@ -530,7 +532,7 @@ async function resizeByBlob(blob, sizeConfig) {
         }
 
         // Chuyển canvas thành blob với định dạng và chất lượng tùy chọn
-        const mimeType = "image/jpeg"; // Hoặc "image/jpeg" nếu cần
+        const mimeType = inputExtention  && inputExtention == "jpg" ? "image/jpeg" : inputExtention == "png" ? "image/png" :  "image/" + inputExtention;  
         const quality = 1; // Chất lượng nén (từ 0.0 đến 1.0)
 
         finalBlob = await new Promise(resolve =>
