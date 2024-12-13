@@ -19,6 +19,7 @@ var dataConfig = {
 var arrImages = [];
 
 function checkImageHTML() {
+    finalBlobs = [];
     var urlHtml = ace.edit("input-html").getValue();
     var inputRegex = $("#input-regex").val();
     var removeParams = $("#check-remove-params");
@@ -105,6 +106,7 @@ function checkImageHTML() {
 }
 
 function checkImageOption() {
+    finalBlobs = [];
     $("#input-list-img,#url-list,#image-list").html("");
     var urlFolder = $("#url-folder").val();
     var urlCount = parseInt($("#url-count").val());
@@ -126,6 +128,7 @@ function checkImageOption() {
 }
 
 function checkImage(id) {
+    finalBlobs = [];
     $(id).find("#url-list,#image-list").html("");
 
     var str = $(id).find("#input-list-img").val();
@@ -158,6 +161,7 @@ function checkImage(id) {
 }
 
 function checkImagePage() {
+    finalBlobs = [];
     var urlPage = $("#input-urlpage").val();
     var tagParent = $("#input-class-parent").val();
     var removeParams = $("#check-remove-params");
