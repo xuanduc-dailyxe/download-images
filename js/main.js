@@ -261,20 +261,18 @@ async function buildHtmlImages(imgArr) {
             fileName = fileName.split('?')[0];
             if (fileNameImage && fileNameImage.length > 0) {
                 try {
-                    response = await fetch(proxyUrl + arrImages[i].trim());
+                    response = await fetch(proxyUrl + arrImages[i].trim(), {
+                        method: 'GET',
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0', // Thêm User-Agent nếu cần 
+                        }
+                    });
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
-
                     blob = await response.blob();
-                    if (sizeConfig) {
-                        finalBlob = await resizeByBlob(blob, sizeConfig);
-                    } else {
-                        finalBlob = await fetch(arrImages[i].trim()).then((r) => {
-                            if (r.status === 200) return r.blob();
-                            return Promise.reject(new Error(r.statusText));
-                        });
-                    }
+                    finalBlob = sizeConfig ? await resizeByBlob(blob, sizeConfig) : blob;
+
                     finalBlobs.push(finalBlob);
                     imageUrl = URL.createObjectURL(finalBlob);
                     image = await createImageBitmap(finalBlob);
@@ -536,7 +534,7 @@ async function resizeByBlob(blob, sizeConfig) {
         }
 
         // Chuyển canvas thành blob với định dạng và chất lượng tùy chọn
-        const mimeType = inputExtention  && inputExtention == "jpg" ? "image/jpeg" : inputExtention == "png" ? "image/png" :  "image/" + inputExtention;  
+        const mimeType = inputExtention && inputExtention == "jpg" ? "image/jpeg" : inputExtention == "png" ? "image/png" : "image/" + inputExtention;
         const quality = 1; // Chất lượng nén (từ 0.0 đến 1.0)
 
         finalBlob = await new Promise(resolve =>
