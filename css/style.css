@@ -37,6 +37,10 @@ img {
     font-size: 100%;
 }
 
+.form-control:focus{
+    border-color: #008CBA;
+}
+
 .form-control.disable {
     background-color: #eee;
 }

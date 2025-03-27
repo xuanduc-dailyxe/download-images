@@ -254,6 +254,7 @@ async function buildHtmlImages(imgArr) {
             arrImages = imgArr;
         }
         var sizeInfo, response, blob, finalBlob, image, width, height, imageUrl, sizeInKB;
+        console.log("arrImages",arrImages);
         for (let i = 0; i < arrImages.length; i++) {
             fileName = "";
             arrStr = arrImages[i].trim().split("/");
@@ -271,32 +272,35 @@ async function buildHtmlImages(imgArr) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     blob = await response.blob();
-                    finalBlob = sizeConfig ? await resizeByBlob(blob, sizeConfig) : blob;
+                    if(blob){
+                        finalBlob = sizeConfig ? await resizeByBlob(blob, sizeConfig) : blob;
 
-                    finalBlobs.push(finalBlob);
-                    imageUrl = URL.createObjectURL(finalBlob);
-                    image = await createImageBitmap(finalBlob);
-                    width = image.width;
-                    height = image.height;
-                    sizeInKB = finalBlob.size / 1024;
-                    sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
-
-                    if (fileExtention && fileExtention.length > 0) {
-                        $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
-                    } else {
-                        extent = fileName.split(".");
-                        strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-                        strExtent = strExtent.split('?')[0];
-                        $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
-                        $("#label-extention").text(strExtent);
-                    }
+                        finalBlobs.push(finalBlob);
+                        imageUrl = URL.createObjectURL(finalBlob);
+                        image = await createImageBitmap(finalBlob);
+                        width = image.width;
+                        height = image.height;
+                        sizeInKB = finalBlob.size / 1024;
+                        sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
+    
+                        if (fileExtention && fileExtention.length > 0) {
+                            $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
+                        } else {
+                            extent = fileName.split(".");
+                            strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
+                            strExtent = strExtent.split('?')[0];
+                            $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
+                            $("#label-extention").text(strExtent);
+                        }
+                    } 
 
                 } catch (error) {
-                    showMessage(`Không thể tải hình ảnh. <br> ${arrImages[i]}  <br> Có thể do lỗi CORS hoặc URL không hợp lệ.`);
-                    continue;
+                    showMessage(`Không thể tải hình ảnh. <br> ${arrImages[i]}  <br> Có thể do lỗi CORS hoặc URL không hợp lệ.`);  
                 }
-            } else {
-                $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileName}</span></div>`);
+            } else { 
+                alert("Chưa nhập Tên file hình!") 
+                $("#input-filename").focus();
+                $("#image-list").append("");
             }
         }
         $("#image-list").addClass("loaded");
