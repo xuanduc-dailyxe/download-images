@@ -316,10 +316,16 @@ async function buildHtmlImages(imgArr) {
             $("#spinner").removeClass("none");
             var index = $(this).closest(".img-item").index();
             var fileNameImage = $("#input-filename").val();
-            var extent = arrImages[index].split(".");
-            var strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-            strExtent = strExtent.split('?')[0];
-            downloadImage(arrImages[index], `${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`);
+            // Xác định extension đúng từ blob MIME type
+            var strExtent;
+            if (fileExtention && fileExtention.length > 0) {
+                strExtent = fileExtention;
+            } else if (finalBlobs && finalBlobs[index]) {
+                strExtent = getExtensionFromBlob(finalBlobs[index], arrImages[index]);
+            } else {
+                strExtent = getExtensionFromBlob(null, arrImages[index]);
+            }
+            downloadImage(arrImages[index], `${fileNameImage}-${formatNumberToString(index + 1)}.${strExtent}`);
             $("#spinner").addClass("none");
         })
 
@@ -376,6 +382,52 @@ function getLocalConfig() {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Lấy extension đúng từ MIME type của blob
+function getExtensionFromMimeType(mimeType) {
+    const mimeMap = {
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+        'image/png': 'png',
+        'image/gif': 'gif',
+        'image/webp': 'webp',
+        'image/bmp': 'bmp',
+        'image/svg+xml': 'svg',
+        'image/tiff': 'tiff',
+        'image/x-icon': 'ico',
+        'image/avif': 'avif',
+        'image/apng': 'apng',
+    };
+    if (mimeType && mimeMap[mimeType.toLowerCase()]) {
+        return mimeMap[mimeType.toLowerCase()];
+    }
+    // Fallback: lấy phần sau 'image/'
+    if (mimeType && mimeType.startsWith('image/')) {
+        return mimeType.split('/')[1].split(';')[0];
+    }
+    return null;
+}
+
+// Xác định extension từ blob (ưu tiên MIME type), fallback từ URL
+function getExtensionFromBlob(blob, url) {
+    // Ưu tiên 1: Từ MIME type của blob
+    if (blob && blob.type) {
+        var ext = getExtensionFromMimeType(blob.type);
+        if (ext) return ext;
+    }
+    // Ưu tiên 2: Từ URL
+    if (url) {
+        var urlPath = url.split('?')[0].split('#')[0];
+        var parts = urlPath.split('.');
+        if (parts.length > 1) {
+            var urlExt = parts[parts.length - 1].toLowerCase();
+            var validExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'ico', 'avif', 'apng'];
+            if (validExts.includes(urlExt)) return urlExt === 'jpeg' ? 'jpg' : urlExt;
+        }
+    }
+    // Fallback mặc định
+    return 'jpg';
+}
+
 const downloadAll = async () => {
     let link = document.createElement("a");
     document.documentElement.append(link);
@@ -383,14 +435,19 @@ const downloadAll = async () => {
     var fileExtention = $('#input-extention').val();
     fileNameImage = fileNameImage && fileNameImage.length > 0 ? fileNameImage : "image_";
     var imgArr = arrImages;
-    var extent = strExtent = "";
 
     if (imgArr) {
         for (let i = 0; i < imgArr.length; i++) {
-            extent = imgArr[i].split(".");
-            strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-            strExtent = strExtent.split('?')[0];
-            downloadImage(imgArr[i], `${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention ? fileExtention : strExtent}`);
+            // Xác định extension đúng từ blob MIME type (nếu có finalBlobs)
+            var strExtent;
+            if (fileExtention && fileExtention.length > 0) {
+                strExtent = fileExtention;
+            } else if (finalBlobs && finalBlobs[i]) {
+                strExtent = getExtensionFromBlob(finalBlobs[i], imgArr[i]);
+            } else {
+                strExtent = getExtensionFromBlob(null, imgArr[i]);
+            }
+            downloadImage(imgArr[i], `${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}`);
             await delay(500);
         }
     } else {
@@ -416,7 +473,6 @@ const saveZip = async (filename, urls) => {
     const folder = zip.folder(nombre);
     var fileNameImage = $("#input-filename").val();
     var fileExtention = $('#input-extention').val();
-    var extent = strExtent = "";
     var name = "";
     $.each(finalBlobs, function (index, finalBlob) {
         $(".spinner-text").text("Đang chuẩn bị dữ liệu..." + "(" + (index + 1) + "/" + finalBlobs.length + ")");
@@ -424,9 +480,14 @@ const saveZip = async (filename, urls) => {
             name = arrImages[index].split(".")[0];
         }
         if (fileNameImage && fileNameImage.length > 0) {
-            strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
-            strExtent = strExtent.split('?')[0];
-            folder.file(`${fileNameImage}-${formatNumberToString(index + 1)}.${fileExtention ? fileExtention : strExtent}`, finalBlob);
+            // Xác định extension đúng từ blob MIME type
+            var strExtent;
+            if (fileExtention && fileExtention.length > 0) {
+                strExtent = fileExtention;
+            } else {
+                strExtent = getExtensionFromBlob(finalBlob, arrImages[index]);
+            }
+            folder.file(`${fileNameImage}-${formatNumberToString(index + 1)}.${strExtent}`, finalBlob);
         } else {
             folder.file(`${name}`, finalBlob);
         }
