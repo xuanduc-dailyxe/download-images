@@ -285,6 +285,7 @@ async function buildHtmlImages(imgArr) {
     
                         if (fileExtention && fileExtention.length > 0) {
                             $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
+                            $("#label-extention").text(fileExtention);
                         } else {
                             extent = fileName.split(".");
                             strExtent = extent && extent.length > 1 ? extent[extent.length - 1] : "jpg";
