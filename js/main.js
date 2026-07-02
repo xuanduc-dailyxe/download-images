@@ -178,7 +178,7 @@ function checkImagePage() {
 
             var imgArr = [];
             var datasrc, src, url;
-            imgTags.each(function () {
+            imgTags.each(function (index, item) {
                 datasrc = $(this).attr("data-src");
                 src = $(this).attr("src");
                 srcset = $(this).attr("srcset");
@@ -190,19 +190,53 @@ function checkImagePage() {
                     }
                     url = url.split(' ')[0];
                     url = url.split(',')[0];
+                    if (repalceParamsFrom && repalceParamsTo && repalceParamsTo.length > 0 && repalceParamsTo.length > 0) {
+                        url = url.replaceAll(repalceParamsFrom, repalceParamsTo);
+                    }
+
+                    arrayFlash = url.split('/');
+                    filename = arrayFlash[arrayFlash.length - 1];
+
                     if (url && !url.startsWith('data:image') && isValidUrl(url)) {
-                        imgArr.push(url);
+                        if (regex !== null) {
+                            while ((m = regex.exec(filename)) !== null) {
+                                try {
+                                    imgTagsTemp.push({ "id": parseInt(m[1]) < 10 ? '0' + m[1] : m[1], "url": url })
+                                } catch (error) {
+                                    imgTagsTemp.push({ "id": m[1], "url": url })
+                                }
+                            }
+                        } else {
+                            imgTagsTemp.push({ "id": index, "url": url })
+                        }
+
                     } else {
-                        let domain = (new URL(urlPage));
-                        const protocol = domain.protocol;
-                        domain = protocol + "//" + domain.hostname;
-                        url = domain + url;
-                        if (url && isValidUrl(url)) {
-                            imgArr.push(url);
+                        if (urlPage && urlPage.length > 0) {
+                            let domain = (new URL(urlPage));
+                            const protocol = domain.protocol;
+                            domain = protocol + "//" + domain.hostname;
+                            url = domain + url;
+                            if (regex !== null) {
+                                while ((m = regex.exec(filename)) !== null) {
+                                    try {
+                                        imgTagsTemp.push({ "id": parseInt(m[1]) < 10 ? '0' + m[1] : m[1], "url": url })
+                                    } catch (error) {
+                                        imgTagsTemp.push({ "id": m[1], "url": url })
+                                    }
+                                }
+                            } else {
+                                imgTagsTemp.push({ "id": index, "url": url })
+                            }
                         }
                     }
                 }
             });
+            if (imgTagsTemp) {
+                imgTagsTemp.sort((a, b) => (a.id > b.id) ? 1 : -1);
+            }
+            $.each(imgTagsTemp, function (index, item) {
+                imgArr.push(item.url);
+            })
             var uniqueImgArr = [...new Set(imgArr)];
             if (uniqueImgArr && uniqueImgArr.length > 0) {
                 buildHtmlImages(uniqueImgArr);
@@ -254,7 +288,7 @@ async function buildHtmlImages(imgArr) {
             arrImages = imgArr;
         }
         var sizeInfo, response, blob, finalBlob, image, width, height, imageUrl, sizeInKB;
-        console.log("arrImages",arrImages);
+        console.log("arrImages", arrImages);
         for (let i = 0; i < arrImages.length; i++) {
             fileName = "";
             arrStr = arrImages[i].trim().split("/");
@@ -272,7 +306,7 @@ async function buildHtmlImages(imgArr) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     blob = await response.blob();
-                    if(blob){
+                    if (blob) {
                         finalBlob = sizeConfig ? await resizeByBlob(blob, sizeConfig) : blob;
 
                         finalBlobs.push(finalBlob);
@@ -282,7 +316,7 @@ async function buildHtmlImages(imgArr) {
                         height = image.height;
                         sizeInKB = finalBlob.size / 1024;
                         sizeInfo = width + "x" + height + "<br>" + sizeInKB.toFixed(2) + "Kb";
-    
+
                         if (fileExtention && fileExtention.length > 0) {
                             $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${fileExtention}</span></div>`);
                             $("#label-extention").text(fileExtention);
@@ -293,13 +327,13 @@ async function buildHtmlImages(imgArr) {
                             $("#image-list").append(`<div class="img-item"><span class="btn btn-delete" data-id="${i}">X</span><span class="size-info">${sizeInfo}</span><span class="btn btn-download" data-id="${i}"><span class="material-symbols-rounded">download</span></span><img src="${imageUrl}" /><span>${fileNameImage}-${formatNumberToString(i + 1)}.${strExtent}</span></div>`);
                             $("#label-extention").text(strExtent);
                         }
-                    } 
+                    }
 
                 } catch (error) {
-                    showMessage(`Không thể tải hình ảnh. <br> ${arrImages[i]}  <br> Có thể do lỗi CORS hoặc URL không hợp lệ.`);  
+                    showMessage(`Không thể tải hình ảnh. <br> ${arrImages[i]}  <br> Có thể do lỗi CORS hoặc URL không hợp lệ.`);
                 }
-            } else { 
-                alert("Chưa nhập Tên file hình!") 
+            } else {
+                alert("Chưa nhập Tên file hình!")
                 $("#input-filename").focus();
                 $("#image-list").append("");
             }
