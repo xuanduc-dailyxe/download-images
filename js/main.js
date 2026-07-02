@@ -175,10 +175,12 @@ function checkImagePage() {
             } else {
                 imgTags = $(wrapper).find("img");
             }
-
+            var imgTagsTemp = [];
             var imgArr = [];
             var datasrc, src, url;
-            
+            var inputRegex = $("#input-regex").val();
+            var regex = inputRegex && inputRegex.length > 0 ? new RegExp(inputRegex, 'g') : null;
+
             var repalceParamsFrom = dataConfig["input-replace-params-from"];
             var repalceParamsTo = dataConfig["input-replace-params-to"];
 
@@ -194,6 +196,8 @@ function checkImagePage() {
                     }
                     url = url.split(' ')[0];
                     url = url.split(',')[0];
+                    console.log("repalceParamsFrom", url);
+                    
                     if (repalceParamsFrom && repalceParamsTo && repalceParamsTo.length > 0 && repalceParamsTo.length > 0) {
                         url = url.replaceAll(repalceParamsFrom, repalceParamsTo);
                     }
