@@ -178,6 +178,10 @@ function checkImagePage() {
 
             var imgArr = [];
             var datasrc, src, url;
+            
+            var repalceParamsFrom = dataConfig["input-replace-params-from"];
+            var repalceParamsTo = dataConfig["input-replace-params-to"];
+
             imgTags.each(function (index, item) {
                 datasrc = $(this).attr("data-src");
                 src = $(this).attr("src");
