@@ -47,6 +47,7 @@ function checkImageHTML() {
             } else {
                 url = datasrc ? datasrc : (srcset ? srcset : src);
             }
+            url = url.startsWith("//") ? "https:" + url : url;
             url = url.split(' ')[0];
             url = url.split(',')[0];
             if (repalceParamsFrom && repalceParamsTo && repalceParamsTo.length > 0 && repalceParamsTo.length > 0) {
