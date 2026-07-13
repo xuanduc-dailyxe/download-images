@@ -590,6 +590,10 @@ async function resizeByBlob(blob, sizeConfig) {
         cropCanvas.width = cropWidth;
         cropCanvas.height = cropHeight;
 
+        // Fill nền trắng để tránh nền đen ở vùng transparent khi export sang JPG
+        cropCtx.fillStyle = '#ffffff';
+        cropCtx.fillRect(0, 0, cropWidth, cropHeight);
+
         cropCtx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
         // Tạo canvas để resize ảnh
@@ -597,6 +601,10 @@ async function resizeByBlob(blob, sizeConfig) {
         const resizeCtx = resizeCanvas.getContext('2d');
         resizeCanvas.width = sizeConfig.width;
         resizeCanvas.height = sizeConfig.height;
+
+        // Fill nền trắng để tránh nền đen ở vùng transparent khi export sang JPG
+        resizeCtx.fillStyle = '#ffffff';
+        resizeCtx.fillRect(0, 0, sizeConfig.width, sizeConfig.height);
 
         resizeCtx.drawImage(cropCanvas, 0, 0, cropWidth, cropHeight, 0, 0, sizeConfig.width, sizeConfig.height);
 
