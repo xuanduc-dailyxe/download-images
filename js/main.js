@@ -658,7 +658,7 @@ async function resizeByBlob(blob, sizeConfig) {
 
         // Chuyển canvas thành blob với định dạng và chất lượng tùy chọn
         const mimeType = inputExtention && inputExtention == "jpg" ? "image/jpeg" : inputExtention == "png" ? "image/png" : "image/" + inputExtention;
-        const quality = 1; // Chất lượng nén (từ 0.0 đến 1.0)
+        const quality = 0.8; // Chất lượng nén (từ 0.0 đến 1.0)
 
         finalBlob = await new Promise(resolve =>
             resizeCanvas.toBlob(resolve, mimeType, quality)
