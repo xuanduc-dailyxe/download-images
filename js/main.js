@@ -38,14 +38,15 @@ function checkImageHTML() {
     var repalceParamsTo = dataConfig["input-replace-params-to"];
 
     imgTags.each(function (index, item) {
+        dataPlaceHolder = $(this).attr("data-placeholder");
         datasrc = $(this).attr("data-src");
         src = $(this).attr("src");
         srcset = $(this).attr("srcset");
-        if (srcset != undefined || datasrc != undefined || src != undefined) {
+        if (dataPlaceHolder != undefined || srcset != undefined || datasrc != undefined || src != undefined) {
             if (removeParams.is(":checked")) {
-                url = datasrc ? datasrc.split('?')[0] : srcset ? srcset.split('?')[0] : src.split('?')[0];
+                url = dataPlaceHolder ? dataPlaceHolder.split('?')[0] : (datasrc ? datasrc.split('?')[0] : srcset ? srcset.split('?')[0] : src.split('?')[0]);
             } else {
-                url = datasrc ? datasrc : (srcset ? srcset : src);
+                url = dataPlaceHolder ? dataPlaceHolder : (datasrc ? datasrc : (srcset ? srcset : src));
             }
             url = url.startsWith("//") ? "https:" + url : url;
             url = url.split(' ')[0];
@@ -186,14 +187,15 @@ function checkImagePage() {
             var repalceParamsTo = dataConfig["input-replace-params-to"];
 
             imgTags.each(function (index, item) {
+                dataPlaceHolder = $(this).attr("data-placeholder");
                 datasrc = $(this).attr("data-src");
                 src = $(this).attr("src");
                 srcset = $(this).attr("srcset");
-                if (srcset != undefined || datasrc != undefined || src != undefined) {
+                if (dataPlaceHolder != undefined || srcset != undefined || datasrc != undefined || src != undefined) {
                     if (removeParams.is(":checked")) {
-                        url = datasrc ? datasrc.split('?')[0] : srcset ? srcset.split('?')[0] : src.split('?')[0];
+                        url = dataPlaceHolder ? dataPlaceHolder.split('?')[0] : (datasrc ? datasrc.split('?')[0] : srcset ? srcset.split('?')[0] : src.split('?')[0]);
                     } else {
-                        url = datasrc ? datasrc : (srcset ? srcset : src);
+                        url = dataPlaceHolder ? dataPlaceHolder : (datasrc ? datasrc : (srcset ? srcset : src));
                     }
                     url = url.startsWith("//") ? "https:" + url : url;
                     url = url.split(' ')[0];
