@@ -242,9 +242,13 @@
                         </div>
                         <div class="col-4">
                             <span class="label">Tải xuống</span> 
-                            <div class="btn-group">
+                            <div class="btn-group" style="align-items: center; flex-wrap: wrap; gap: 6px;">
                                 <button class="btn btn-primary btn-download mr-1 disabled" onclick="downloadAll()"><span class="material-symbols-rounded">download</span>Tải từng hình</button>
                                 <button class="btn btn-default btn-download disabled" onclick="downloadZip()"><span class="material-symbols-rounded">folder_zip</span>Tải file nén</button>
+                                <div style="display: flex; align-items: center; gap: 4px; margin-left: 4px;">
+                                    <input class="form-control mr-1" id="check-high-quality" data-field="check-high-quality" type="checkbox" />
+                                    <span class="label" style="flex-shrink: 0; margin: 0;">Chất lượng cao</span>
+                                </div>
                             </div>
                         </div>
                     </div>
